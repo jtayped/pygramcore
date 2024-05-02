@@ -1,3 +1,4 @@
+from selenium import webdriver
 import os
 
 from exceptions.Format import IncorrectFormat
@@ -11,8 +12,8 @@ class Account:
         self.email = email
         self.auth = False
 
-    @check_navigation
-    def login(self, password: str):
+    @check_navigation()
+    def login(self, driver: webdriver.Chrome, password: str):
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
 
@@ -21,6 +22,7 @@ class Account:
         """
         # TODO: implement the functionality
         # Test code
+        driver.get("google.com")
         self.auth = True
 
     @check_auth
@@ -45,7 +47,7 @@ class Account:
 def test():
     account = Account("example@example.com")
     account.login("password123")
-    account.post("path/to/image.jpg")
+    # account.post("path/to/image.jpg")
 
 
 if __name__ == "__main__":

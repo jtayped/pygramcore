@@ -10,6 +10,6 @@ def check_navigation(func):
         if url and url != instance.current_url:
             instance.get(url)
 
-        return instance
+        return func(instance)
 
     return wrapper
