@@ -13,7 +13,7 @@ class Account:
         self.auth = False
 
     @get_webdriver
-    def login(self, driver: webdriver.Chrome, password: str):
+    def login(self, password: str, driver: webdriver.Chrome):
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
 
@@ -28,7 +28,7 @@ class Account:
 
     @check_auth
     @get_webdriver
-    def post(self, driver: webdriver.Chrome, image_path: str):
+    def post(self, image_path: str, driver: webdriver.Chrome):
         """
         Posts a specific image to the account.
 
