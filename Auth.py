@@ -23,8 +23,11 @@ class Account:
 
     def __post_init__(self):
         self.driver: webdriver.Chrome = None
-        self.logged_in = True if self.cookies else False
+        self._logged_in = True if self.cookies else False
 
+    def is_logged_in(self):
+        return self._logged_in
+    
     @get_webdriver
     def login(self, password: str) -> list[dict]:
         """
