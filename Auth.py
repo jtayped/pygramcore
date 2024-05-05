@@ -40,7 +40,7 @@ class Account:
             list[dict]: list of cookies.
         """
         # TODO: implement the functionality
-        self.logged_in = True # test
+        self._logged_in = True # test
 
         # Return cookies after logging in
         cookies = self.driver.get_cookies()
