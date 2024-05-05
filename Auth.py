@@ -1,4 +1,5 @@
 from selenium import webdriver
+from dataclasses import dataclass
 import os
 
 from exceptions.Format import IncorrectFormat
@@ -7,24 +8,44 @@ from constants import IMAGE_FORMATS
 from utils.auth import *
 
 
+@dataclass
 class Account:
-    def __init__(self, email: str) -> None:
-        self.email = email
-        self.auth = False
+    """
+    Represents an Instagram account.
+
+    Args:
+        email (str): Email linked to the Instagram account.
+        cookies (list[dict]): Cookies associated with the account.
+    """
+
+    email: str
+    cookies: list[dict] = None
+
+    def __post_init__(self):
+        self.driver: webdriver.Chrome = None
+        self.logged_in = True if self.cookies else False
 
     @get_webdriver
-    def login(self, password: str, driver: webdriver.Chrome):
+    def login(self, password: str) -> list[dict]:
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
 
         Args:
-            password (str): password related to the account
+            password (str): password related to the account.
+
+        Returns:
+            list[dict]: list of cookies.
         """
         # TODO: implement the functionality
+        self.logged_in = True # test
+
+        # Return cookies after logging in
+        cookies = self.driver.get_cookies()
+        return cookies
 
     @check_auth
     @get_webdriver
-    def post(self, image_path: str, driver: webdriver.Chrome):
+    def post(self, image_path: str):
         """
         Posts a specific image to the account.
 
@@ -38,12 +59,13 @@ class Account:
             raise IncorrectFormat()
 
         # TODO: posting functionality
-        print(image_path)
 
 
 # Usage
 def test():
-    account = Account("example@example.com")
+    account = Account(
+        "example@example.com",
+    )
     account.login("password123")
     account.post("path/to/image.jpg")
 
