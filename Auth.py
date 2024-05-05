@@ -2,7 +2,7 @@ from selenium import webdriver
 import os
 
 from exceptions.Format import IncorrectFormat
-from utils.navigation import check_navigation
+from utils.navigation import get_webdriver
 from constants import IMAGE_FORMATS
 from utils.auth import *
 
@@ -12,7 +12,7 @@ class Account:
         self.email = email
         self.auth = False
 
-    @check_navigation()
+    @get_webdriver
     def login(self, driver: webdriver.Chrome, password: str):
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
@@ -22,12 +22,13 @@ class Account:
         """
         # TODO: implement the functionality
         # Test code
-        driver.get("google.com")
+        print(password)
+        driver.get("https://www.google.com/")
         self.auth = True
 
     @check_auth
-    @check_navigation
-    def post(self, image_path: str):
+    @get_webdriver
+    def post(self, driver: webdriver.Chrome, image_path: str):
         """
         Posts a specific image to the account.
 
@@ -41,13 +42,14 @@ class Account:
             raise IncorrectFormat()
 
         # TODO: posting functionality
+        print(image_path)
 
 
 # Usage
 def test():
     account = Account("example@example.com")
     account.login("password123")
-    # account.post("path/to/image.jpg")
+    account.post("path/to/image.jpg")
 
 
 if __name__ == "__main__":

@@ -1,15 +1,12 @@
 from driver import WebDriver
+from constants import INSTAGRAM_URL
 
 
-def check_navigation(func):
-    def wrapper(url: str = None):
+def get_webdriver(func):
+    def wrapper(self, *args, **kwargs):
         # Get current instance of the driver
         instance = WebDriver.get_instance()
 
-        # Check if currently on the same page
-        if url and url != instance.current_url:
-            instance.get(url)
-
-        return func(instance)
+        return func(self, instance, *args, **kwargs)
 
     return wrapper
