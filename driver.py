@@ -14,7 +14,6 @@ class WebDriver(type):
         Returns the current instance of the webdriver.
         """
         if cls._instance is None:
-            print("aaa")
             options = webdriver.ChromeOptions()
 
             cls._instance = webdriver.Chrome(options=options)

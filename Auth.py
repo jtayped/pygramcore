@@ -21,10 +21,6 @@ class Account:
             password (str): password related to the account
         """
         # TODO: implement the functionality
-        # Test code
-        print(password)
-        driver.get("https://www.google.com/")
-        self.auth = True
 
     @check_auth
     @get_webdriver
