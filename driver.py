@@ -2,14 +2,13 @@ from selenium import webdriver
 from selenium_stealth import stealth
 
 
-class WebDriver(type):
+class WebDriver:
     """
-    Singleton for the main instance of the driver. Use `WebDriver.get_instance()` to get the current instance of the driver.
+    Singleton for the main instance of the driver. Use `WebDriver()` to get the current instance of the driver.
     """
     _instance = None
 
-    @classmethod
-    def get_instance(cls):
+    def __new__(cls):
         """
         Returns the current instance of the webdriver.
         """
