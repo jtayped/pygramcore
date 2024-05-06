@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://pypi.org/project/PyGramCore/">
-    <img src="https://img.shields.io/pypi/v/pygramcore">
+    <img src="https://img.shields.io/pypi/v/pygramcore?style=for-the-badge">
   </a>
   <a href="/LICENSE">
       <img src="https://img.shields.io/github/license/jtayped/pygramcore?style=for-the-badge" alt="License">
