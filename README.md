@@ -26,15 +26,11 @@
 <p align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#how-to-use">How To Use</a> •
-  <a href="#download">Download</a> •
-  <a href="#credits">Credits</a> •
   <a href="#related">Related</a> •
-  <a href="#license">License</a>
 </p>
 
 ## Key Features
 
-- **Webdriver Singleton**: Share a single webdriver instance across multiple elements.
 - **Modular Elements**: Easily use and customize modular elements such as Posts, Comments, and Users.
 
   - **Users**: Follow, download posts, direct message, and more.
