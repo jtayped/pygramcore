@@ -3,7 +3,7 @@ from codecs import open
 from os import path
 
 NAME = "PyGramCore"
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 DESCRIPTION = "A simple-to-use Instagram Python interface using Selenium."
 
 # Get the long description from the README file
