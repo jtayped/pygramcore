@@ -25,6 +25,7 @@ def get_webdriver(url: str = None):
     """
 
     def decorator(func):
+        @disallow_notifications
         def wrapper(account, *args, **kwargs):
             # Get current instance of the driver
             instance = WebDriver()
@@ -36,15 +37,21 @@ def get_webdriver(url: str = None):
             account.driver = instance
 
             # Add cookies to the driver if any
-            if account.get_cookies():
+            account_cookies = account.get_cookies()
+            if account_cookies:
                 current_cookies = instance.get_cookies()
 
-                for cookie in account.cookies:
+                for cookie in account_cookies:
                     # Check if they have been added already
                     if cookie not in current_cookies:
+                        print("aa")
                         instance.add_cookie(cookie)
 
-            return func(account, *args, **kwargs)
+                # Refresh page to effectuate cookies
+                instance.refresh()
+
+            value = func(account, *args, **kwargs)
+            return value
 
         return wrapper
 
@@ -59,7 +66,7 @@ def handle_cookies_dialog(func):
         # Attempt to click the cookies dialog if found
         # If not, it shall pass
         try:
-            btn = WebDriverWait(driver, 5).until(
+            btn = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable(
                     (
                         By.CSS_SELECTOR,
@@ -92,7 +99,7 @@ def disallow_notifications(func):
 
         # Attempt to disallow notifications
         try:
-            btn = WebDriverWait(driver, 5).until(
+            btn = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable(
                     (
                         By.CSS_SELECTOR,

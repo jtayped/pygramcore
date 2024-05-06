@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from typing import List, Dict, Union
 import os
 import time
 import random
@@ -11,19 +12,45 @@ from constants import *
 
 class Account:
     """
-    Represents an Instagram account.
+    Represents an instagram account.
+
+    Args:
+        email_or_cookies (Union[str, List[Dict[str, str]]]):
+            Either the email address of the account as a string or
+            a list of cookies as dictionaries. If email is provided,
+            the `password` argument can be optionally provided.
+        password (str, optional):
+            The password of the account. Required if `email_or_cookies`
+            is an email address. Defaults to None.
+
+    Raises:
+        RuntimeError:
+            If an attempt is made to instantiate more than one Account object.
+        ValueError:
+            If the `email_or_cookies` argument is neither a string nor a list.
     """
 
     _instance = None
 
-    def __init__(self, email: str, password: str):
+    def __init__(
+        self, email_or_cookies: Union[str, List[Dict[str, str]]], password: str = None
+    ):
         if Account._instance is not None:
             raise RuntimeError("Cannot instantiate more than one Account.")
         Account._instance = self
-        self._email = email
-        self._password = password
-        self._cookies = None
-        self._logged_in = False
+
+        if isinstance(email_or_cookies, str):
+            self._email = email_or_cookies
+            self._password = password
+            self._cookies = []
+        elif isinstance(email_or_cookies, list):
+            self._email = None
+            self._password = None
+            self._cookies = email_or_cookies
+        else:
+            raise ValueError("Invalid argument type for email_or_cookies.")
+
+        self._logged_in = bool(self._cookies)
         self.driver: webdriver.Chrome = None
 
     @classmethod
@@ -69,21 +96,15 @@ class Account:
         )
         login_btn.click()
 
+        # Wait till fully logged in
+        time.sleep(5)
+
+        # Update value
+        self._logged_in = True
+
         # Return cookies after logging in
         self._cookies = self.driver.get_cookies()
         return self._cookies
-
-    def write(self, input, text):
-        """
-        Types some text letter by letter at random intervals in an input field. This is done so the interaction feels more "human-like".
-
-        Args:
-            input (WebElement): The input to write in.
-            text (str): Text being written.
-        """
-        for letter in text:
-            input.send_keys(letter)
-            time.sleep(random.random())
 
     @get_webdriver(INSTAGRAM_URL)
     def post(self, image_path):
@@ -98,3 +119,16 @@ class Account:
             raise IncorrectFormat()
 
         # TODO: posting functionality
+        print(image_path, "AUTHED")
+
+    def write(self, input, text):
+        """
+        Types some text letter by letter at random intervals in an input field. This is done so the interaction feels more "human-like".
+
+        Args:
+            input (WebElement): The input to write in.
+            text (str): Text being written.
+        """
+        for letter in text:
+            input.send_keys(letter)
+            time.sleep(random.random()/3)
