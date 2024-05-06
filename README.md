@@ -2,7 +2,7 @@
   <br>
   <img src="/images/icon.png" alt="PyGramCore" width="200">
   <br>
-  PyGramCore
+  📷 PyGramCore
   <br>
 </h1>
 
@@ -31,7 +31,7 @@
 
 <div id="key-features"></div>
 
-## Key Features
+## 🔑 Key Features
 
 - **Modular Elements**: Easily use and customize modular elements such as Posts, Comments, and Users.
 
@@ -45,7 +45,7 @@
 
 <div id="how-to-use"></div>
 
-## How To Use
+## ❔ How To Use
 
 To use authenticated actions, initialize your Instagram account with your email/password:
 
@@ -67,7 +67,7 @@ Please refer to the docs for more.
 
 <div id="related"></div>
 
-## You may also like...
+## 🙋‍♂️ You may also like...
 
 - [TikTok Manager](https://github.com/jtayped/tiktok-manager) - A script that manages MULTIPLE TikTok accounts by schedueling automatically generated videos from pre-selected YouTube channels to TikTok in advance.
 - [My Portfolio](https://joeltaylor.business) - Check out my front-end and SEO skills on my Portfolio!
