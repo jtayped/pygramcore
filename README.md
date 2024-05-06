@@ -26,8 +26,10 @@
 <p align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#how-to-use">How To Use</a> •
-  <a href="#related">Related</a> •
+  <a href="#related">Related</a>
 </p>
+
+<div id="key-features"></div>
 
 ## Key Features
 
@@ -40,6 +42,8 @@
   - **Posts**: Like, comment, save, download, and more.
 
   - **Comments**: Like, reply, and engage.
+
+<div id="how-to-use"></div>
 
 ## How To Use
 
@@ -60,6 +64,8 @@ user = User("jtayped_")
 ```
 
 Please refer to the docs for more.
+
+<div id="related"></div>
 
 ## You may also like...
 
