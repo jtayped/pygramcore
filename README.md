@@ -47,12 +47,38 @@
 
 ## ❔ How To Use
 
-To use authenticated actions, initialize your Instagram account with your email/password:
+First of all, install the package using:
+
+```bash
+pip install pygramcore
+```
+
+To take authenticated actions, initialize your Instagram account with your email/password and login:
 
 ```python
 from pygramcore.auth import Account
+import pickle
 
 account = Account("example@example.com", "yourpassword")
+cookies = account.login() # might require interaction due to CAPTCHAs
+
+# Your implementation to save cookies...
+# with open("path/to/cookies.pkl", 'wb') as file:
+#   pickle.dump(cookies, file)
+
+# Your implementation to read cookies...
+# with open("path/to/cookies.pkl", 'rb') as file:
+#   cookies = pickle.load(file)
+
+# Initialize the account with cookies
+account = Account(cookies)
+```
+
+This will allow you to post images, comment on other peoples posts, send DMs, etc...
+
+```python
+# Post an image with an optional caption
+account.post("path/to/image.png", "Your very interesting caption")
 ```
 
 To search for a user simply:
@@ -61,6 +87,20 @@ To search for a user simply:
 from pygramcore.elements.User import User
 
 user = User("jtayped_")
+```
+
+And you can take some actions with this account:
+
+```python
+# Get a list of Post() objects
+posts = user.get_posts(limit=50)
+
+# Like the first 10 posts in the user's feed
+for post in posts[:10]:
+  post.like()
+
+# Send a direct message to the user
+user.send_dm("What's up?")
 ```
 
 Please refer to the docs for more.
