@@ -10,13 +10,13 @@
 
 <p align="center">
   <a href="https://pypi.org/project/PyGramCore/">
-    <img src="https://badge.fury.io/py/PyGramCore.svg">
+    <img src="https://img.shields.io/pypi/v/pygramcore">
   </a>
   <a href="/LICENSE">
       <img src="https://img.shields.io/github/license/jtayped/pygramcore?style=for-the-badge" alt="License">
   </a>
     <a href="/issues">
-      <img src="https://img.shields.io/github/issues/jtayped/pygramcore" alt="License">
+      <img src="https://img.shields.io/github/issues/jtayped/pygramcore?style=for-the-badge" alt="License">
   </a>
   <a href="https://www.linkedin.com/in/jtayped/">
       <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
