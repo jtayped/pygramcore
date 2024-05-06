@@ -71,7 +71,6 @@ class Account:
 
     @get_webdriver(INSTAGRAM_LOGIN_URL)
     @handle_cookies_dialog
-    @disallow_notifications
     def login(self):
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
@@ -107,7 +106,7 @@ class Account:
         return self._cookies
 
     @get_webdriver(INSTAGRAM_URL)
-    def post(self, image_path):
+    def post(self, image_path: str, caption: str = None):
         """
         Posts a specific image to the account.
         Args:
@@ -118,17 +117,50 @@ class Account:
         if extension[1:] not in MEDIA_FORMATS:
             raise IncorrectFormat()
 
-        # TODO: posting functionality
-        print(image_path, "AUTHED")
+        # Open create dialog
+        create_button = self.driver.find_element(
+            By.CSS_SELECTOR,
+            "svg[aria-label='New post']",
+        )
+        create_button.click()
 
-    def write(self, input, text):
+        # Add file to the input
+        file_input = self.driver.find_element(By.CSS_SELECTOR, "input[type='file']")
+        file_input.send_keys(image_path)
+
+        # Click 'Next' next button twice
+        for _ in range(2):
+            # It requires to be found each iteration due to the "StaleElementReferenceException"
+            next_btn = self.driver.find_element(
+                By.CSS_SELECTOR,
+                "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div > div > div > div._ap97 > div > div > div > div._ac7b._ac7d > div",
+            )
+            next_btn.click()
+            time.sleep(random.random())
+
+        # Write caption if specified
+        if caption:
+            caption_input = self.driver.find_element(
+                By.CSS_SELECTOR, "div[aria-label='Write a caption...']"
+            )
+            self.write(caption_input, caption)
+
+        # Click 'Share' button
+        share_btn = self.driver.find_element(
+            By.CSS_SELECTOR,
+            "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div > div > div > div._ap97 > div > div > div > div._ac7b._ac7d > div",
+        )
+        # next_btn.click()
+
+    def write(self, input, text, speed=3):
         """
         Types some text letter by letter at random intervals in an input field. This is done so the interaction feels more "human-like".
 
         Args:
             input (WebElement): The input to write in.
             text (str): Text being written.
+            speed (int): Divides the random float (from 0 to 1). The higher the number the faster it writes.
         """
         for letter in text:
             input.send_keys(letter)
-            time.sleep(random.random()/3)
+            time.sleep(random.random() / speed)

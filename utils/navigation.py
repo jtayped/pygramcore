@@ -25,7 +25,6 @@ def get_webdriver(url: str = None):
     """
 
     def decorator(func):
-        @disallow_notifications
         def wrapper(account, *args, **kwargs):
             # Get current instance of the driver
             instance = WebDriver()
@@ -44,11 +43,13 @@ def get_webdriver(url: str = None):
                 for cookie in account_cookies:
                     # Check if they have been added already
                     if cookie not in current_cookies:
-                        print("aa")
                         instance.add_cookie(cookie)
 
                 # Refresh page to effectuate cookies
                 instance.refresh()
+
+                # Close notification dialog
+                disallow_notifications()
 
             value = func(account, *args, **kwargs)
             return value
@@ -66,7 +67,7 @@ def handle_cookies_dialog(func):
         # Attempt to click the cookies dialog if found
         # If not, it shall pass
         try:
-            btn = WebDriverWait(driver, 2).until(
+            btn = WebDriverWait(driver, 3).until(
                 EC.element_to_be_clickable(
                     (
                         By.CSS_SELECTOR,
@@ -76,7 +77,7 @@ def handle_cookies_dialog(func):
             )
             btn.click()
         except:
-            pass
+            print("Not found")
 
         # Run function being decorated
         value = func(*args, **kwargs)
@@ -85,32 +86,23 @@ def handle_cookies_dialog(func):
     return wrapper
 
 
-def disallow_notifications(func):
+def disallow_notifications():
     """
     Clicks "Not Now" when Instagram asks for notification access. This decorator should be placed on functions that login the account.
     """
+    # Get current instance of the driver
+    driver = WebDriver()
 
-    def wrapper(*args, **kwargs):
-        # Run function being decorated
-        value = func(*args, **kwargs)
-
-        # Get current instance of the driver
-        driver = WebDriver()
-
-        # Attempt to disallow notifications
-        try:
-            btn = WebDriverWait(driver, 2).until(
-                EC.element_to_be_clickable(
-                    (
-                        By.CSS_SELECTOR,
-                        "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div._a9-z > button._a9--._ap36._a9_1",
-                    )
+    # Attempt to disallow notifications
+    try:
+        btn = WebDriverWait(driver, 3).until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div._a9-z > button._a9--._ap36._a9_1",
                 )
             )
-            btn.click()
-        except:
-            pass
-
-        return value
-
-    return wrapper
+        )
+        btn.click()
+    except:
+        print("not found")

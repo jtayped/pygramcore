@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium_stealth import stealth
 
-
 class WebDriver:
     """
     Singleton for the main instance of the driver. Use `WebDriver()` to get the current instance of the driver.
