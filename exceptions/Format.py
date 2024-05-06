@@ -1,4 +1,4 @@
-from constants import IMAGE_FORMATS
+from constants import MEDIA_FORMATS
 
 
 class IncorrectFormat(Exception):
@@ -7,7 +7,7 @@ class IncorrectFormat(Exception):
     def __init__(
         self,
         message: str = "The file is not the correct format.",
-        formats: list[str] = IMAGE_FORMATS,
+        formats: list[str] = MEDIA_FORMATS,
         *args,
         **kwargs
     ) -> None:
