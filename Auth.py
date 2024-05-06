@@ -1,7 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
-import os, time
+import os
+import time
+import random
 
 from exceptions.Format import IncorrectFormat
 from utils.navigation import *
@@ -43,6 +44,7 @@ class Account:
 
     @get_webdriver(INSTAGRAM_LOGIN_URL)
     @handle_cookies_dialog
+    @disallow_notifications
     def login(self):
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
@@ -53,13 +55,13 @@ class Account:
         email_input = self.driver.find_element(
             By.CSS_SELECTOR, "#loginForm > div > div:nth-child(1) > div > label > input"
         )
-        email_input.send_keys(self._email)
+        self.write(email_input, self._email)
 
         # Write password
         password_input = self.driver.find_element(
             By.CSS_SELECTOR, "#loginForm > div > div:nth-child(2) > div > label > input"
         )
-        password_input.send_keys(self._password)
+        self.write(password_input, self._password)
 
         # Login
         login_btn = self.driver.find_element(
@@ -67,10 +69,21 @@ class Account:
         )
         login_btn.click()
 
-        time.sleep(100)
         # Return cookies after logging in
         self._cookies = self.driver.get_cookies()
         return self._cookies
+
+    def write(self, input, text):
+        """
+        Types some text letter by letter at random intervals in an input field. This is done so the interaction feels more "human-like".
+
+        Args:
+            input (WebElement): The input to write in.
+            text (str): Text being written.
+        """
+        for letter in text:
+            input.send_keys(letter)
+            time.sleep(random.random())
 
     @get_webdriver(INSTAGRAM_URL)
     def post(self, image_path):
@@ -85,11 +98,3 @@ class Account:
             raise IncorrectFormat()
 
         # TODO: posting functionality
-
-
-def test():
-    acc = Account("jtayped@gmail.com", "Tayped123+")
-    acc.login()
-
-if __name__ == "__main__":
-    test()

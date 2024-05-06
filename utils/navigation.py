@@ -1,3 +1,8 @@
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
 from driver import WebDriver
 from constants import IMPLICIT_WAIT
 
@@ -51,19 +56,54 @@ def handle_cookies_dialog(func):
         # Get current instance of the driver
         driver = WebDriver()
 
-        # Set implicit wait to lower value
-        driver.implicitly_wait(2)
-
+        # Attempt to click the cookies dialog if found
+        # If not, it shall pass
         try:
-            # Attempt to decline cookies
-            btn = driver.find_element("button._a9--._ap36._a9_1")
+            btn = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable(
+                    (
+                        By.CSS_SELECTOR,
+                        "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe.x5yr21d.x19onx9a > div > button._a9--._ap36._a9_1",
+                    )
+                )
+            )
             btn.click()
         except:
             pass
-        finally:
-            driver.implicitly_wait(IMPLICIT_WAIT)
 
         # Run function being decorated
-        func(*args, **kwargs)
+        value = func(*args, **kwargs)
+        return value
+
+    return wrapper
+
+
+def disallow_notifications(func):
+    """
+    Clicks "Not Now" when Instagram asks for notification access. This decorator should be placed on functions that login the account.
+    """
+
+    def wrapper(*args, **kwargs):
+        # Run function being decorated
+        value = func(*args, **kwargs)
+
+        # Get current instance of the driver
+        driver = WebDriver()
+
+        # Attempt to disallow notifications
+        try:
+            btn = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable(
+                    (
+                        By.CSS_SELECTOR,
+                        "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div._a9-z > button._a9--._ap36._a9_1",
+                    )
+                )
+            )
+            btn.click()
+        except:
+            pass
+
+        return value
 
     return wrapper
