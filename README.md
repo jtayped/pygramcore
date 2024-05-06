@@ -63,12 +63,17 @@ account = Account("example@example.com", "yourpassword")
 cookies = account.login() # might require interaction due to CAPTCHAs
 
 # Your implementation to save cookies...
-# with open("path/to/cookies.pkl", 'wb') as file:
-#   pickle.dump(cookies, file)
+with open("path/to/cookies.pkl", 'wb') as file:
+  pickle.dump(cookies, file)
+```
+
+To initialize an account from cookies:
+```python
+import pickle
 
 # Your implementation to read cookies...
-# with open("path/to/cookies.pkl", 'rb') as file:
-#   cookies = pickle.load(file)
+with open("path/to/cookies.pkl", 'rb') as file:
+  cookies = pickle.load(file)
 
 # Initialize the account with cookies
 account = Account(cookies)
@@ -89,7 +94,7 @@ from pygramcore.elements.User import User
 user = User("jtayped_")
 ```
 
-And you can take some actions with this account:
+Here is an example of the usage of a user:
 
 ```python
 # Get a list of Post() objects
