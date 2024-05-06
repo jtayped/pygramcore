@@ -1,7 +1,14 @@
-MEDIA_FORMATS = {"jpg", "jpeg", "png", "gif", "webp", "mp4", "mpeg4", "mov"}
+MEDIA_FORMATS = {
+    "jpeg",
+    "png",
+    "heic",
+    "heif",
+    "mp4",
+    "quicktime",
+}
 
 # Driver values
-IMPLICIT_WAIT = 10 # in sec.
+IMPLICIT_WAIT = 10  # in sec.
 
 # URLs
 INSTAGRAM_URL = "https://www.instagram.com"
