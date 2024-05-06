@@ -1,9 +1,10 @@
 from selenium import webdriver
-import os
+from selenium.webdriver.common.by import By
+
+import os, time
 
 from exceptions.Format import IncorrectFormat
-from exceptions.Auth import AuthException
-from utils.navigation import get_webdriver
+from utils.navigation import *
 from constants import *
 
 
@@ -22,7 +23,7 @@ class Account:
         self._password = password
         self._cookies = None
         self._logged_in = False
-        self.driver = None
+        self.driver: webdriver.Chrome = None
 
     @classmethod
     def get_instance(cls):
@@ -41,15 +42,32 @@ class Account:
         return self._logged_in
 
     @get_webdriver(INSTAGRAM_LOGIN_URL)
+    @handle_cookies_dialog
     def login(self):
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
         Returns:
             list[dict]: list of cookies.
         """
-        # TODO: implement the functionality
-        self._logged_in = True  # test
+        # Write email
+        email_input = self.driver.find_element(
+            By.CSS_SELECTOR, "#loginForm > div > div:nth-child(1) > div > label > input"
+        )
+        email_input.send_keys(self._email)
 
+        # Write password
+        password_input = self.driver.find_element(
+            By.CSS_SELECTOR, "#loginForm > div > div:nth-child(2) > div > label > input"
+        )
+        password_input.send_keys(self._password)
+
+        # Login
+        login_btn = self.driver.find_element(
+            By.CSS_SELECTOR, "#loginForm > div > div:nth-child(3) > button"
+        )
+        login_btn.click()
+
+        time.sleep(100)
         # Return cookies after logging in
         self._cookies = self.driver.get_cookies()
         return self._cookies
@@ -67,3 +85,11 @@ class Account:
             raise IncorrectFormat()
 
         # TODO: posting functionality
+
+
+def test():
+    acc = Account("jtayped@gmail.com", "Tayped123+")
+    acc.login()
+
+if __name__ == "__main__":
+    test()
