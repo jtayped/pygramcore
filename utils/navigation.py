@@ -1,22 +1,41 @@
 from driver import WebDriver
-from constants import INSTAGRAM_URL
 
 
-def get_webdriver(func):
-    def wrapper(account, *args, **kwargs):
-        # Get current instance of the driver
-        instance = WebDriver()
-        account.driver = instance
+def get_webdriver(url: str):
+    """
+    Passes the current instance of the webdriver in the arguments.
 
-        # Add cookies to the driver if any
-        if account.get_cookies():
-            current_cookies = instance.get_cookies()
+    Args:
+        url (str): Initial URL to go to.
+    
+    Usage:
+    ```
+    @get_webdriver("https://google.com")
+    def your_function(driver):
+        ...
+        
+    your_function()
+    ```
+    """
+    def decorator(func):
+        def wrapper(account, *args, **kwargs):
+            # Get current instance of the driver
+            instance = WebDriver()
+            instance.get(url)
 
-            for cookie in account.cookies:
-                # Check if they have been added already
-                if cookie not in current_cookies:
-                    instance.add_cookie(cookie)
+            account.driver = instance
 
-        return func(account, *args, **kwargs)
+            # Add cookies to the driver if any
+            if account.get_cookies():
+                current_cookies = instance.get_cookies()
 
-    return wrapper
+                for cookie in account.cookies:
+                    # Check if they have been added already
+                    if cookie not in current_cookies:
+                        instance.add_cookie(cookie)
+
+            return func(account, *args, **kwargs)
+
+        return wrapper
+    
+    return decorator

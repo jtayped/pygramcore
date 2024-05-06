@@ -4,7 +4,7 @@ import os
 from exceptions.Format import IncorrectFormat
 from exceptions.Auth import AuthException
 from utils.navigation import get_webdriver
-from constants import IMAGE_FORMATS
+from constants import *
 
 
 class Account:
@@ -40,7 +40,7 @@ class Account:
     def is_logged_in(self):
         return self._logged_in
 
-    @get_webdriver
+    @get_webdriver(INSTAGRAM_LOGIN_URL)
     def login(self):
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
@@ -54,7 +54,7 @@ class Account:
         self._cookies = self.driver.get_cookies()
         return self._cookies
 
-    @get_webdriver
+    @get_webdriver(INSTAGRAM_URL)
     def post(self, image_path):
         """
         Posts a specific image to the account.
