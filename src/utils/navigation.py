@@ -25,7 +25,8 @@ def get_webdriver(url: str = None):
     """
 
     def decorator(func):
-        def wrapper(account, *args, **kwargs):
+        @handle_cookies_dialog(before=False)
+        def wrapper(obj, *args, **kwargs):
             # Get current instance of the driver
             instance = WebDriver()
 
@@ -33,25 +34,27 @@ def get_webdriver(url: str = None):
             if url:
                 instance.get(url)
 
-            account.driver = instance
+            obj.driver = instance
 
             # Add cookies to the driver if any
-            account_cookies = account.get_cookies()
-            if account_cookies:
-                current_cookies = instance.get_cookies()
+            if "get_cookies" in dir(obj):
+                account_cookies = obj.get_cookies()
 
-                for cookie in account_cookies:
-                    # Check if they have been added already
-                    if cookie not in current_cookies:
-                        instance.add_cookie(cookie)
+                if account_cookies:
+                    current_cookies = instance.get_cookies()
 
-                # Refresh page to effectuate cookies
-                instance.refresh()
+                    for cookie in account_cookies:
+                        # Check if they have been added already
+                        if cookie not in current_cookies:
+                            instance.add_cookie(cookie)
 
-                # Close notification dialog
-                disallow_notifications()
+                    # Refresh page to effectuate cookies
+                    instance.refresh()
 
-            value = func(account, *args, **kwargs)
+                    # Close notification dialog
+                    disallow_notifications()
+
+            value = func(obj, *args, **kwargs)
             return value
 
         return wrapper
@@ -59,31 +62,38 @@ def get_webdriver(url: str = None):
     return decorator
 
 
-def handle_cookies_dialog(func):
-    def wrapper(*args, **kwargs):
-        # Get current instance of the driver
-        driver = WebDriver()
+def handle_cookies_dialog(before=True):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            # Get current instance of the driver
+            driver = WebDriver()
 
-        # Attempt to click the cookies dialog if found
-        # If not, it shall pass
-        try:
-            btn = WebDriverWait(driver, 3).until(
-                EC.element_to_be_clickable(
-                    (
-                        By.CSS_SELECTOR,
-                        "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe.x5yr21d.x19onx9a > div > button._a9--._ap36._a9_1",
+            if not before:
+                value = func(*args, **kwargs)
+
+            # Attempt to click the cookies dialog if found
+            # If not, it shall pass
+            try:
+                btn = WebDriverWait(driver, 3).until(
+                    EC.element_to_be_clickable(
+                        (
+                            By.CSS_SELECTOR,
+                            "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe.x5yr21d.x19onx9a > div > button._a9--._ap36._a9_1",
+                        )
                     )
                 )
-            )
-            btn.click()
-        except:
-            print("Not found")
+                btn.click()
+            except:
+                print("Not found")
 
-        # Run function being decorated
-        value = func(*args, **kwargs)
-        return value
+            if before:
+                value = func(*args, **kwargs)
 
-    return wrapper
+            return value
+
+        return wrapper
+
+    return decorator
 
 
 def disallow_notifications():

@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from elements.User import User
 from utils.misc import parse_instagram_date
 
 
 @dataclass
 class Comment:
-    author: str | User
+    author: str
     date_posted: str | datetime
     text: str
 
@@ -15,8 +14,8 @@ class Comment:
         # Convert the strings to approrpriate objects if strings
         if isinstance(self.date_posted, str):
             self.date_posted = parse_instagram_date(self.date_posted)
-        if isinstance(self.author, str):
-            self.author = User(self.author)
+        #if isinstance(self.author, str):
+        #    self.author = User(self.author)
 
     def like(self) -> None:
         pass
