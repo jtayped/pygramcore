@@ -45,7 +45,7 @@
 
 <div id="how-to-use"></div>
 
-## ❔ How To Use
+## ❓ How To Use
 
 First of all, install the package using:
 
@@ -114,5 +114,5 @@ Please refer to the docs for more.
 
 ## 🙋‍♂️ You may also like...
 
-- [TikTok Manager](https://github.com/jtayped/tiktok-manager) - A script that manages MULTIPLE TikTok accounts by schedueling automatically generated videos from pre-selected YouTube channels to TikTok in advance.
-- [My Portfolio](https://joeltaylor.business) - Check out my front-end and SEO skills on my Portfolio!
+- [✂️📱TikTok Manager](https://github.com/jtayped/tiktok-manager) - A script that manages MULTIPLE TikTok accounts by schedueling automatically generated videos from pre-selected YouTube channels to TikTok in advance.
+- [🧑‍💼My Portfolio](https://joeltaylor.business) - Check out my front-end and SEO skills on my Portfolio!
