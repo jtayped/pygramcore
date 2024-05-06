@@ -2,17 +2,19 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-NAME = "PyGramCore"
-VERSION = '0.0.2'
+# Read version from VERSION file
+here = path.abspath(path.dirname(__file__))
+with open(path.join(here, "VERSION"), encoding="utf-8") as f:
+    VERSION = f.read().strip()
+
 DESCRIPTION = "A simple-to-use Instagram Python interface using Selenium."
 
 # Get the long description from the README file
-here = path.abspath(path.dirname(__file__))
 with open(path.join(here, "README.md"), encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()
 
 setup(
-    name=NAME,
+    name="PyGramCore",
     version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
