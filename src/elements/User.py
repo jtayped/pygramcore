@@ -4,9 +4,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from urllib.parse import urlparse
 import math
 
-from utils.navigation import get_webdriver
+from pygram import get_driver
 from elements.Post import Post
 from constants import *
 
@@ -23,36 +24,37 @@ class User:
     name: str
 
     def __post_init__(self):
-        self.driver: webdriver.Chrome = None
+        self._driver: webdriver.Chrome = None
+        self.url = f"{INSTAGRAM_URL}/{self.name}/"
 
-    @get_webdriver()
+    @get_driver()
     def is_private(self) -> bool:
         pass
 
-    @get_webdriver()
+    @get_driver()
     def follow(self) -> None:
         pass
 
-    @get_webdriver()
+    @get_driver()
     def unfollow(self) -> None:
         pass
 
-    @get_webdriver()
+    @get_driver()
     def get_followers(self) -> int:
         pass
 
-    @get_webdriver()
+    @get_driver()
     def get_following(self) -> int:
         pass
 
-    @get_webdriver()
+    @get_driver()
     def send_dm(self, message: str) -> None:
         pass
 
-    @get_webdriver()
+    @get_driver()
     def get_posts(self, reels=True, limit=10) -> list[Post]:
-        # Go to webpage
-        self.driver.get(f"{INSTAGRAM_URL}/{self.name}/")
+        # Go to user instagram page
+        self._driver.get(self.url)
 
         css_selector = "a[href^='/p/']"
         if reels:
@@ -63,19 +65,23 @@ class User:
         # Scroll down to load posts
         while len(posts) < limit:
             # Scroll down
-            self.driver.find_element(By.TAG_NAME, "body").send_keys(Keys.END)
+            self._driver.find_element(By.TAG_NAME, "body").send_keys(Keys.END)
 
             # Wait for new posts to load
-            WebDriverWait(self.driver, 10).until(
+            WebDriverWait(self._driver, 10).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, css_selector))
             )
 
             # Get all posts
-            post_elements = self.driver.find_elements(By.CSS_SELECTOR, css_selector)
+            post_elements = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
 
             # Add new posts to the list
             for post_element in post_elements:
-                post = Post(post_element)
+                href = post_element.get_attribute("href")
+                path = urlparse(href).path
+                id = path.split("/")[2]
+
+                post = Post(id)
                 posts.append(post)
 
             # If no new posts loaded, break the loop
