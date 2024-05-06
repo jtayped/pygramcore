@@ -94,7 +94,7 @@ class Account:
         """
         # Check if image is the correct format
         _, extension = os.path.splitext(image_path)
-        if extension[1:] not in IMAGE_FORMATS:
+        if extension[1:] not in MEDIA_FORMATS:
             raise IncorrectFormat()
 
         # TODO: posting functionality
