@@ -1,5 +1,4 @@
-# TODO: add more supported formats
-IMAGE_FORMATS = ["png", "jpg"]
+MEDIA_FORMATS = {"jpg", "jpeg", "png", "gif", "webp", "mp4", "mpeg4", "mov"}
 
 # Driver values
 IMPLICIT_WAIT = 10 # in sec.
