@@ -39,12 +39,34 @@ class User:
         pass
 
     @get_driver()
+    def get_total_posts(self) -> int:
+        posts_span, _, _ = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
+        posts_str = posts_span.find_element(By.CSS_SELECTOR, "span").text
+
+        # Remove the commas and convert to integer
+        followers = int(posts_str.replace(",", ""))
+        return followers
+
+    @get_driver()
     def get_followers(self) -> int:
-        pass
+        # Gets the string value (e.g. "156,204")
+        _, followers_span, _ = self._driver.find_elements(
+            By.CSS_SELECTOR, "span._ac2a"
+        )
+        followers_str = followers_span.get_property("title")
+
+        # Remove the commas and convert to integer
+        followers = int(followers_str.replace(",", ""))
+        return followers
 
     @get_driver()
     def get_following(self) -> int:
-        pass
+        _, _, following_span = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
+        following_str = following_span.find_element(By.CSS_SELECTOR, "span").text
+
+        # Remove the commas and convert to integer
+        followers = int(following_str.replace(",", ""))
+        return followers
 
     @get_driver()
     def send_dm(self, message: str) -> None:
