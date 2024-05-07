@@ -1,5 +1,13 @@
 from datetime import datetime
+from selenium import webdriver
 import time, random
+
+def navigate(driver: webdriver.Chrome, url: str):
+    # No need to navigate if already on the same URL
+    if driver.current_url == url:
+        return
+    
+    driver.get(url)
 
 def parse_instagram_date(time: str):
     return datetime.strptime(time, "%Y-%m-%dT%H:%M:%S.%fZ")

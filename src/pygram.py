@@ -6,7 +6,7 @@ import pickle, os, time, random
 from constants import *
 from exceptions.Auth import AuthException
 from exceptions.Format import IncorrectFormat
-from utils.misc import write
+from utils.misc import write, navigate
 
 
 def check_authorization(func):
@@ -33,7 +33,11 @@ def get_driver(url: str = None):
             obj._driver = driver
 
             if url:
-                obj._driver.get(url)
+                navigate(obj._driver, url)
+            else:
+                # Check if obj has a URL attribute
+                if hasattr(obj, 'url'):
+                    navigate(obj._driver, obj.url)
 
             # Run the function and return the value
             value = func(obj, *args, **kwargs)
