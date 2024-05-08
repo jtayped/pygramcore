@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, List, Union
+from typing import Literal
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -198,21 +198,18 @@ class User(metaclass=Navigator):
     @user_dialog_action
     def mute(
         self,
-        *modes: Union[List[Literal["posts", "stories"]], Literal["posts", "stories"]],
+        *modes: Literal["posts", "stories"],
     ):
         """
         Mutes the user's posts and/or stories. It is important to note that this function only enables the option, and can't disable it.
 
         Args:
-            modes (List[posts and/or stories] or posts and/or stories): Modes to mute, which can be posts and/or stories.
+            modes ("posts" and/or "stories"): Modes to mute, which can be posts and/or stories.
 
         Usage:
         ```python
         user = User("username")
-
         user.mute("stories", "posts")
-        # or
-        user.mute(["stories", "posts"])
         ```
 
         Raises:
@@ -256,10 +253,10 @@ class User(metaclass=Navigator):
 
     def user_dialog_open(self) -> bool:
         """
-        Checks if the user dialog is open.
+        Checks if the user dialog is open. The user dialog refers to the menu that opens when clicking the 'Following' button in the user page.
 
         Returns:
-            bool
+            bool: Whether the dialog is open
         """
         elements = self._driver.find_elements(
             By.CSS_SELECTOR,
