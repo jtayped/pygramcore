@@ -39,16 +39,60 @@ def init_driver() -> webdriver.Chrome:
     return driver
 
 
-class PyGram:
-    _driver = init_driver()
-    _logged_in = False
+class Navigator(type):
+    def __new__(cls, name, bases, dct):
+        """
+        Wraps all relevant functions with _default_initialize_website to initialize the object's url and provide the current instance of the driver.
+        """
+        _initialize_website = dct.get(
+            "_initialize_website", cls._default_initialize_website
+        )
+        for key, value in dct.items():
+            if not key.startswith("__") and key != "_initialize_website":
+                # Support for class methods that aren't the get_instance function.
+                # This is done to prevent a recursion error, because the get_instance
+                # function is the function used in _initialize_website (causing the error)
+                if isinstance(value, classmethod) and key != "get_instance":
+                    wrapped_method = classmethod(
+                        cls.wrap_method(value.__func__, _initialize_website)
+                    )
+                    dct[key] = wrapped_method
+                else:
+                    if callable(value):
+                        wrapped_method = cls.wrap_method(value, _initialize_website)
+                        dct[key] = wrapped_method
+        return super().__new__(cls, name, bases, dct)
+
+    @staticmethod
+    def wrap_method(method, before_all_method):
+        def wrapped(self, *args, **kwargs):
+            before_all_method(self)
+            return method(self, *args, **kwargs)
+
+        return wrapped
+
+    @staticmethod
+    def _default_initialize_website(self):
+        """
+        Provides the current instance of the driver to the object and navigates to the URL of it's object if there is any.
+        """
+        if not hasattr(self, "_driver"):
+            self._driver = PyGram.get_instance()
+
+        if hasattr(self, "url"):
+            navigate(self._driver, self.url)
+
+
+class PyGram(metaclass=Navigator):
+    _driver: webdriver.Chrome
+    _logged_in: bool = False
 
     @classmethod
     def get_instance(cls):
         """
         Returns the current instance of the webdriver.
         """
-        if cls._driver is None:
+        if not hasattr(cls, "_driver"):
             driver = init_driver()
             cls._driver = driver
 
@@ -146,7 +190,7 @@ class PyGram:
             By.CSS_SELECTOR,
             "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div > div > div > div._ap97 > div > div > div > div._ac7b._ac7d > div",
         )
-        next_btn.click()
+        share_btn.click()
 
     @classmethod
     def get_cookies(cls):
@@ -178,33 +222,3 @@ class PyGram:
     @classmethod
     def is_logged_in(cls):
         return cls._logged_in
-
-
-class Navigator(type):
-    def __new__(cls, name, bases, dct):
-        _initialize_website = dct.get(
-            "_initialize_website", cls._default_initialize_website
-        )
-        for key, value in dct.items():
-            if (
-                callable(value)
-                and not key.startswith("__")
-                and key != "_initialize_website"
-            ):
-                dct[key] = cls.wrap_method(value, _initialize_website)
-        return super().__new__(cls, name, bases, dct)
-
-    @staticmethod
-    def wrap_method(method, before_all_method):
-        def wrapped(self, *args, **kwargs):
-            before_all_method(self)
-            return method(self, *args, **kwargs)
-
-        return wrapped
-
-    @staticmethod
-    def _default_initialize_website(self):
-        self._driver = PyGram.get_instance()
-
-        if "url" in dir(self):
-            navigate(self._driver, self.url)
