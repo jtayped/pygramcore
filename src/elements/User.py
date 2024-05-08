@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal, List, Union
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -51,7 +52,7 @@ def user_dialog_action(func):
 
 
 @dataclass
-class User(Navigator):
+class User(metaclass=Navigator):
     """
     Represents an Instagram user.
 
@@ -62,11 +63,8 @@ class User(Navigator):
     name: str
 
     def __post_init__(self):
-        # Init navigator (driver)
-        super().__init__()
-
+        self._driver: webdriver.Chrome
         self.url = f"{INSTAGRAM_URL}/{self.name}/"
-        self._driver.get(self.url)
 
     @check_authorization
     def is_private(self) -> bool:
@@ -261,9 +259,6 @@ class User(Navigator):
         pass  # TODO
 
     def get_posts(self, reels=True, limit=10) -> list[Post]:
-        # Go to user instagram page
-        self._driver.get(self.url)
-
         css_selector = "a[href^='/p/']"
         if reels:
             css_selector += ",a[href^='/reel/']"

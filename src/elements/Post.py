@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import ClassVar
 from selenium.webdriver.common.by import By
+from selenium import webdriver
 
 from exceptions.post import *
 from constants import *
@@ -8,7 +9,7 @@ from pygram import Navigator, check_authorization
 
 
 @dataclass
-class Post(Navigator):
+class Post(metaclass=Navigator):
     id: str
 
     # To identify state of the button
@@ -21,11 +22,8 @@ class Post(Navigator):
     )
 
     def __post_init__(self):
-        # Init navigator (driver)
-        super().__init__()
-
+        self._driver: webdriver.Chrome
         self.url = f"{INSTAGRAM_URL}/p/{self.id}"
-        self._driver.get(self.url)
 
     @check_authorization
     def like(self) -> None:

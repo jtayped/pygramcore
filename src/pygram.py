@@ -6,7 +6,7 @@ import pickle, os, time, random
 from constants import *
 from exceptions.auth import *
 from exceptions.format import *
-from utils.misc import write
+from utils.misc import write, navigate
 
 
 def check_authorization(func):
@@ -42,7 +42,7 @@ def init_driver() -> webdriver.Chrome:
 class PyGram:
     _driver = init_driver()
     _logged_in = False
-    
+
     @classmethod
     def get_instance(cls):
         """
@@ -180,6 +180,31 @@ class PyGram:
         return cls._logged_in
 
 
-class Navigator:
-    def __init__(self) -> None:
+class Navigator(type):
+    def __new__(cls, name, bases, dct):
+        _initialize_website = dct.get(
+            "_initialize_website", cls._default_initialize_website
+        )
+        for key, value in dct.items():
+            if (
+                callable(value)
+                and not key.startswith("__")
+                and key != "_initialize_website"
+            ):
+                dct[key] = cls.wrap_method(value, _initialize_website)
+        return super().__new__(cls, name, bases, dct)
+
+    @staticmethod
+    def wrap_method(method, before_all_method):
+        def wrapped(self, *args, **kwargs):
+            before_all_method(self)
+            return method(self, *args, **kwargs)
+
+        return wrapped
+
+    @staticmethod
+    def _default_initialize_website(self):
         self._driver = PyGram.get_instance()
+
+        if "url" in dir(self):
+            navigate(self._driver, self.url)
