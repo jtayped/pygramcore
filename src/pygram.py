@@ -10,6 +10,13 @@ from utils.misc import write, navigate
 
 
 def check_authorization(func):
+    """
+    Decorator that checks if the current account is logged in.
+
+    Raises:
+        NotAuthenticated: Raises when the current account is not logged in.
+    """
+
     def wrapper(*args, **kwargs):
         logged_in = PyGram.is_logged_in()
         if not logged_in:
@@ -193,12 +200,24 @@ class PyGram(metaclass=Navigator):
         share_btn.click()
 
     @classmethod
-    def get_cookies(cls):
+    def get_cookies(cls) -> list[dict]:
+        """
+        Returns the current cookies contained in the webdriver.
+
+        Returns:
+            list[dict]: list of cookies.
+        """
         cookies = cls._driver.get_cookies()
         return cookies
 
     @classmethod
     def set_cookies(cls, cookies: list[dict]):
+        """
+        Removes all cookies and adds a list of new ones.
+
+        Args:
+            cookies (list[dict]): List of cookies from `.get_cookies()`.
+        """
         cls._driver.delete_all_cookies()
         cls._driver.get(INSTAGRAM_URL)
 
@@ -207,6 +226,12 @@ class PyGram(metaclass=Navigator):
 
     @classmethod
     def load_cookies(cls, path: str):
+        """
+        Loads cookies from a file.
+
+        Args:
+            path (str): path to the file.
+        """
         with open(path, "rb") as file:
             cookies = pickle.load(file)
 
@@ -215,10 +240,19 @@ class PyGram(metaclass=Navigator):
 
     @classmethod
     def save_cookies(cls, path: str):
-        # TODO: add argument to add custom cookies (which is not required)
+        """
+        Saves the current cookies to a file.
+
+        Args:
+            path (str): path to the file.
+        """
         with open(path, "wb") as file:
             pickle.dump(cls.get_cookies(), file)
 
     @classmethod
-    def is_logged_in(cls):
+    def is_logged_in(cls) -> bool:
+        """
+        Returns:
+            bool: Whether the account is logged in.
+        """
         return cls._logged_in

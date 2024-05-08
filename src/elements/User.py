@@ -72,6 +72,13 @@ class User(metaclass=Navigator):
 
     @check_authorization
     def follow(self) -> None:
+        """
+        Follows the user with the current account logged in.
+
+        Raises:
+            UserAlreadyFollowed: Raises when the user is already followed. Use `.is_followed()` to check if followed.
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
         if self.is_following():
             raise UserAlreadyFollowed(self.name)
 
@@ -81,6 +88,13 @@ class User(metaclass=Navigator):
     @check_authorization
     @user_dialog_action
     def unfollow(self) -> None:
+        """
+        Unfollows the user with the current account logged in.
+
+        Raises:
+            UserNotFollowed: Raises when the user is not followed. Use `.is_followed()` to check if followed.
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
         if not self.is_following():
             raise UserNotFollowed(self.name)
 
@@ -99,7 +113,7 @@ class User(metaclass=Navigator):
             bool: True if the user is followed, False if not.
 
         Raises:
-            UserError: If it cannot determine if the user is followed or not.
+            NotAuthenticated: Raises when the current account is not logged in.
         """
 
         self._driver.implicitly_wait(1)
@@ -115,7 +129,11 @@ class User(metaclass=Navigator):
     @user_dialog_action
     def add_close_friend(self):
         """
-        Adds user to close friends.
+        Adds the user to the current account's close friends.
+
+        Raises:
+            UserCloseFriend: Raises when the user is already a close friend.
+            NotAuthenticated: Raises when the current account is not logged in.
         """
         if self.is_close_friend():
             raise UserCloseFriend(self.name)
@@ -128,6 +146,13 @@ class User(metaclass=Navigator):
     @check_authorization
     @user_dialog_action
     def remove_close_friend(self):
+        """
+        Removes the user from the current account's close friends.
+
+        Raises:
+            UserNotCloseFriend: Raises when the user is not close friends already.
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
         if not self.is_close_friend():
             raise UserNotCloseFriend(self.name)
 
@@ -138,7 +163,16 @@ class User(metaclass=Navigator):
 
     @check_authorization
     @user_dialog_action
-    def is_close_friend(self):
+    def is_close_friend(self) -> bool:
+        """
+        Checks if the user is a close friend.
+
+        Returns:
+            bool: Whether the user is a close friend
+
+        Raises:
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
         self._driver.implicitly_wait(2)
 
         # Check if not close friend
@@ -167,7 +201,7 @@ class User(metaclass=Navigator):
         *modes: Union[List[Literal["posts", "stories"]], Literal["posts", "stories"]],
     ):
         """
-        This function mutes the posts or stories of a user. It is important to note that this function only enables the option, and can't disable it.
+        Mutes the user's posts and/or stories. It is important to note that this function only enables the option, and can't disable it.
 
         Args:
             modes (List[posts and/or stories] or posts and/or stories): Modes to mute, which can be posts and/or stories.
@@ -183,6 +217,7 @@ class User(metaclass=Navigator):
 
         Raises:
             ValueError: if a mode in the arguments does not exist.
+            NotAuthenticated: Raises when the current account is not logged in.
         """
         if isinstance(modes[0], str):
             modes = list(modes)
@@ -220,17 +255,28 @@ class User(metaclass=Navigator):
         submit_btn.click()
 
     def user_dialog_open(self) -> bool:
-        # Check for elements that comply with the CSS selector
+        """
+        Checks if the user dialog is open.
+
+        Returns:
+            bool
+        """
         elements = self._driver.find_elements(
             By.CSS_SELECTOR,
             "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div.x9f619.xjbqb8w.x78zum5.x168nmei.x13lgxp2.x5pf9jr.xo71vjh.xyamay9.x1pi30zi.x1l90r2v.x1swvt13.x1uhb9sk.x1plvlek.xryxfnj.x1c4vz4f.x2lah0s.xdt5ytf.xqjyukv.x6s0dn4.x1oa3qoh.x1nhvcw1 > span",
         )
 
-        # Return whether any elements have been found
+        # Return whether any elements are in the list (found or not)
         is_open = bool(elements)
         return is_open
 
     def get_total_posts(self) -> int:
+        """
+        Get the user's total amount of posts.
+
+        Returns:
+            int: total posts
+        """
         posts_span, _, _ = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
         posts_str = posts_span.find_element(By.CSS_SELECTOR, "span").text
 
@@ -239,6 +285,12 @@ class User(metaclass=Navigator):
         return followers
 
     def get_followers(self) -> int:
+        """
+        Get the user's total amount of followers
+
+        Returns:
+            int: total followers
+        """
         # Gets the string value (e.g. "156,204")
         _, followers_span, _ = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
         followers_str = followers_span.get_property("title")
@@ -248,6 +300,12 @@ class User(metaclass=Navigator):
         return followers
 
     def get_following(self) -> int:
+        """
+        Get the amount of people the user follows.
+
+        Returns:
+            int: total following
+        """
         _, _, following_span = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
         following_str = following_span.find_element(By.CSS_SELECTOR, "span").text
 
@@ -258,7 +316,28 @@ class User(metaclass=Navigator):
     def send_dm(self, message: str) -> None:
         pass  # TODO
 
-    def get_posts(self, reels=True, limit=10) -> list[Post]:
+    def get_posts(self, reels=True, limit=25) -> list[Post]:
+        """
+        Get a list of posts from the user's account.
+
+        Args:
+            reels (bool, optional): Whether to include reels or not. Defaults to True.
+            limit (int, optional): Limits the amount of posts to retrieve. Defaults to 25.
+
+        Returns:
+            list[Post]: List of post objects
+
+        Usage:
+        ```python
+        # Fetch username's posts
+        user = User("username")
+        posts = user.get_posts()
+
+        # Like his first three posts
+        for post in posts[:3]:
+            post.like()
+        ```
+        """
         css_selector = "a[href^='/p/']"
         if reels:
             css_selector += ",a[href^='/reel/']"

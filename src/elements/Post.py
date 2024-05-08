@@ -27,6 +27,13 @@ class Post(metaclass=Navigator):
 
     @check_authorization
     def like(self) -> None:
+        """
+        Likes the post.
+
+        Raises:
+            PostLiked: Raises when the post is already liked.
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
         if self.is_liked():
             raise PostLiked()
 
@@ -38,6 +45,13 @@ class Post(metaclass=Navigator):
 
     @check_authorization
     def unlike(self) -> None:
+        """
+        Unlikes the post.
+
+        Raises:
+            PostNotLiked: Raises when the post is not liked already.
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
         if not self.is_liked():
             raise PostNotLiked()
 
@@ -49,13 +63,13 @@ class Post(metaclass=Navigator):
     @check_authorization
     def is_liked(self) -> bool:
         """
-        Check whether the post is liked.
+        Checks whether the post is liked.
 
         Returns:
-            bool: True if the post is liked, False if not.
+            bool: whether the post is liked.
 
         Raises:
-            PostError: If it cannot determine if the post is liked or not.
+            NotAuthenticated: Raises when the current account is not logged in.
         """
 
         self._driver.implicitly_wait(1)

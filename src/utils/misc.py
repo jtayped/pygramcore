@@ -4,6 +4,9 @@ import time, random
 
 
 def navigate(driver: webdriver.Chrome, url: str):
+    """
+    Navigates to a URL only if the URL is different to the current.
+    """
     # No need to navigate if already on the same URL
     if driver.current_url == url:
         return
