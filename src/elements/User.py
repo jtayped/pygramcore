@@ -1,17 +1,54 @@
 from dataclasses import dataclass
-from typing import Literal, List
+from typing import Literal, List, Union
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urlparse
-import time
 
 from pygram import get_driver, check_authorization
 from elements.Post import Post
 from exceptions.User import *
 from constants import *
+
+
+def user_dialog_action(func):
+    """
+    Decorator function that opens and closes the user dialog. The user dialog is where you can take actions on a user, such as: unfollowing, adding or removing from close friends, etc...
+    """
+
+    def wrapper(user: "User", *args, **kwargs):
+        if not user.is_following():
+            raise UserActionError("Can't open dialog if not following.")
+
+        # Check if it's not already open
+        if user.user_dialog_open():
+            return
+
+        # Open the dialog
+        dialog_btn = user._driver.find_element(By.XPATH, '//div[text()="Following"]')
+        dialog_btn.click()
+
+        # Perform function being decorated
+        value = func(user, *args, **kwargs)
+
+        # Attempt to close the user dialog, some actions
+        # close the dialog automatically (e.g. unfollowing)
+        try:
+            close_btn = user._driver.find_element(
+                By.CSS_SELECTOR,
+                "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div.x78zum5.xds687c.x1iorvi4.x1sxyh0.xjkvuk6.xurb0ha.x10l6tqk.x1vjfegm > div > div > svg",
+            )
+            close_btn.click()
+        except:
+            pass
+        finally:
+            user._driver.implicitly_wait(IMPLICIT_WAIT)
+
+        return value
+
+    return wrapper
 
 
 @dataclass
@@ -42,19 +79,19 @@ class User:
 
         follow_btn = self._driver.find_element(By.XPATH, '//div[text()="Follow"]')
         follow_btn.click()
-        time.sleep(100)
-
-        # Wait to load
-        time.sleep(2)
 
     @check_authorization
     @get_driver()
+    @user_dialog_action
     def unfollow(self) -> None:
         if not self.is_following():
             raise UserActionError("You don't follow this user.")
 
-        self.open_user_dialog()
-        # TODO
+        unfollow_btn = self._driver.find_element(
+            By.CSS_SELECTOR,
+            "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div:nth-child(8)",
+        )
+        unfollow_btn.click()
 
     @check_authorization
     @get_driver()
@@ -82,12 +119,11 @@ class User:
 
     @check_authorization
     @get_driver()
+    @user_dialog_action
     def add_close_friend(self):
         """
         Adds user to close friends.
         """
-        self.open_user_dialog()
-
         if self.is_close_friend():
             raise UserActionError("User is already a close friend.")
 
@@ -98,13 +134,11 @@ class User:
 
     @check_authorization
     @get_driver()
+    @user_dialog_action
     def remove_close_friend(self):
-        self.open_user_dialog()
-
         if not self.is_close_friend():
             raise UserActionError("User must be a close friend to be removed.")
 
-        # TODO
         close_friend_btn = self._driver.find_element(
             By.CSS_SELECTOR, "svg[aria-label='Close friend']"
         )
@@ -112,55 +146,90 @@ class User:
 
     @check_authorization
     @get_driver()
+    @user_dialog_action
     def is_close_friend(self):
-        self.open_user_dialog()
-
         self._driver.implicitly_wait(2)
 
         # Check if not close friend
         elements = self._driver.find_elements(
-            By.CSS_SELECTOR, "div[contains(text(), 'Add to Close Friends list')]"
+            By.XPATH, '//svg[contains(@class,"x5n08af")][@width="16"]'
         )
+
         if elements:
             self._driver.implicitly_wait(IMPLICIT_WAIT)
             return False
 
         # Check if already close friend
         elements = self._driver.find_elements(
-            By.CSS_SELECTOR, "div[contains(text(), 'Close friend')]"
+            By.XPATH,
+            '//svg[contains(@class,"x1g9anri")]',
         )
+
         if elements:
             self._driver.implicitly_wait(IMPLICIT_WAIT)
             return True
 
-        raise UserActionError("Couldn't find any indicator of close friends state...")
-
     @check_authorization
     @get_driver()
-    def add_favourites(self):
-        self.open_user_dialog()
-        # TODO
+    @user_dialog_action
+    def mute(
+        self,
+        *modes: Union[List[Literal["posts", "stories"]], Literal["posts", "stories"]],
+    ):
+        """
+        This function mutes the posts or stories of a user. It is important to note that this function only enables the option, and can't disable it.
 
-    @check_authorization
+        Args:
+            modes (List[posts and/or stories] or posts and/or stories): Modes to mute, which can be posts and/or stories.
+
+        Usage:
+        ```python
+        user = User("username")
+
+        user.mute("stories", "posts")
+        # or
+        user.mute(["stories", "posts"])
+        ```
+
+        Raises:
+            ValueError: if a mode in the arguments does not exist.
+        """
+        if isinstance(modes[0], str):
+            modes = list(modes)
+
+        if not all(mode in ["posts", "stories"] for mode in modes):
+            raise ValueError("This mute mode does not exist!")
+
+        mute_menu = self._driver.find_element(
+            By.CSS_SELECTOR,
+            "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div:nth-child(6)",
+        )
+        mute_menu.click()
+
+        mute_btns = self._driver.find_elements(
+            By.XPATH,
+            '//input[@dir="ltr"]',
+        )
+
+        # Associate mute modes to indexes of the options on the menu
+        mode_indexes = {"posts": 0, "stories": 1}
+        for mode in modes:
+            mute_btn_idx = mode_indexes[mode]
+            mute_btn = mute_btns[mute_btn_idx]
+
+            # Check if the mode is checked already
+            is_checked = mute_btn.get_attribute("aria-checked")
+            if is_checked.lower() == "false":
+                mute_btn.click()
+
+        # Submit options
+        submit_btn = self._driver.find_element(
+            By.CSS_SELECTOR,
+            "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div.x9f619.xjbqb8w.x78zum5.x168nmei.x13lgxp2.x5pf9jr.xo71vjh.x1uhb9sk.x1plvlek.xryxfnj.x1c4vz4f.x2lah0s.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1 > div.x9f619.xjbqb8w.x78zum5.x168nmei.x13lgxp2.x5pf9jr.xo71vjh.x1y1aw1k.x1sxyh0.xwib8y2.xurb0ha.x1uhb9sk.x1plvlek.xryxfnj.x1c4vz4f.x2lah0s.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1 > div",
+        )
+        submit_btn.click()
+
     @get_driver()
-    def mute(self, modes: List[Literal["posts", "stories"]]):
-        self.open_user_dialog()
-        # TODO
-
-    @check_authorization
-    @get_driver()
-    def open_user_dialog(self):
-        if not self.is_following():
-            raise UserActionError("Can't open dialog if not following.")
-
-        # Check if it's not already open
-        if self.user_dialog_open():
-            return
-
-        # Open the dialog
-        unfollow_btn = self._driver.find_element(By.XPATH, '//div[text()="Following"]')
-        unfollow_btn.click()
-
     def user_dialog_open(self) -> bool:
         # Check for elements that comply with the CSS selector
         elements = self._driver.find_elements(
@@ -202,7 +271,7 @@ class User:
 
     @get_driver()
     def send_dm(self, message: str) -> None:
-        pass
+        pass  # TODO
 
     @get_driver()
     def get_posts(self, reels=True, limit=10) -> list[Post]:
