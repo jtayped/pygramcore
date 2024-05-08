@@ -1,12 +1,18 @@
-class UserError(Exception):
-    """Unspecified user error"""
-
-    def __init__(self, message: str, *args, **kwargs):
-        super().__init__(message, *args, **kwargs)
+class UserAlreadyFollowed(Exception):
+    def __init__(self, username: str) -> None:
+        super().__init__(f"You already follow {username}.")
 
 
-class UserActionError(Exception):
-    """Raised when action can't be taken on a post."""
+class UserNotFollowed(Exception):
+    def __init__(self, username: str) -> None:
+        super().__init__(f"You don't follow {username} yet.")
 
-    def __init__(self, message: str = "Unvalid action.", *args, **kwargs):
-        super().__init__(message, *args, **kwargs)
+
+class UserCloseFriend(Exception):
+    def __init__(self, username: str) -> None:
+        super().__init__(f"You are already close friends with {username}.")
+
+
+class UserNotCloseFriend(Exception):
+    def __init__(self, username: str) -> None:
+        super().__init__(f"You haven't added {username} to your close friends yet.")

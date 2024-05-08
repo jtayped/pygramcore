@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import Literal, List, Union
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,7 +8,7 @@ from urllib.parse import urlparse
 
 from pygram import Navigator, check_authorization
 from elements.Post import Post
-from exceptions.User import *
+from exceptions.user import *
 from constants import *
 
 
@@ -20,7 +19,7 @@ def user_dialog_action(func):
 
     def wrapper(user: "User", *args, **kwargs):
         if not user.is_following():
-            raise UserActionError("Can't open dialog if not following.")
+            raise UserNotFollowed(user.name)
 
         # Check if it's not already open
         if user.user_dialog_open():
@@ -76,7 +75,7 @@ class User(Navigator):
     @check_authorization
     def follow(self) -> None:
         if self.is_following():
-            raise UserActionError("You already follow this user.")
+            raise UserAlreadyFollowed(self.name)
 
         follow_btn = self._driver.find_element(By.XPATH, '//div[text()="Follow"]')
         follow_btn.click()
@@ -85,7 +84,7 @@ class User(Navigator):
     @user_dialog_action
     def unfollow(self) -> None:
         if not self.is_following():
-            raise UserActionError("You don't follow this user.")
+            raise UserNotFollowed(self.name)
 
         unfollow_btn = self._driver.find_element(
             By.CSS_SELECTOR,
@@ -113,8 +112,6 @@ class User(Navigator):
         elif self._driver.find_elements(By.XPATH, '//div[text()="Following"]'):
             self._driver.implicitly_wait(10)
             return True
-        else:
-            raise UserError("Cannot determine if user is followed or not.")
 
     @check_authorization
     @user_dialog_action
@@ -123,7 +120,7 @@ class User(Navigator):
         Adds user to close friends.
         """
         if self.is_close_friend():
-            raise UserActionError("User is already a close friend.")
+            raise UserCloseFriend(self.name)
 
         close_friend_btn = self._driver.find_element(
             By.CSS_SELECTOR, "svg[aria-label='Close friend']"
@@ -134,7 +131,7 @@ class User(Navigator):
     @user_dialog_action
     def remove_close_friend(self):
         if not self.is_close_friend():
-            raise UserActionError("User must be a close friend to be removed.")
+            raise UserNotCloseFriend(self.name)
 
         close_friend_btn = self._driver.find_element(
             By.CSS_SELECTOR, "svg[aria-label='Close friend']"

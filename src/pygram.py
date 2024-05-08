@@ -4,16 +4,16 @@ from selenium.webdriver.common.by import By
 import pickle, os, time, random
 
 from constants import *
-from exceptions.Auth import AuthException
-from exceptions.Format import IncorrectFormat
-from utils.misc import write, navigate
+from exceptions.auth import *
+from exceptions.format import *
+from utils.misc import write
 
 
 def check_authorization(func):
     def wrapper(*args, **kwargs):
         logged_in = Account.is_logged_in()
         if not logged_in:
-            raise AuthException("Account is not authenticated.")
+            raise NotAuthenticated()
 
         value = func(*args, **kwargs)
         return value
@@ -110,7 +110,7 @@ class Account:
         # Check if image is the correct format
         _, extension = os.path.splitext(media_path)
         if extension[1:] not in MEDIA_FORMATS:
-            raise IncorrectFormat()
+            raise InvalidFormat()
 
         # Open create dialog
         create_button = cls._driver.find_element(

@@ -1,12 +1,8 @@
 from dataclasses import dataclass
 from typing import ClassVar
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import time
 
-from exceptions.Post import *
+from exceptions.post import *
 from constants import *
 from pygram import Navigator, check_authorization
 
@@ -34,7 +30,7 @@ class Post(Navigator):
     @check_authorization
     def like(self) -> None:
         if self.is_liked():
-            raise PostActionError("Post is already liked.")
+            raise PostLiked()
 
         likeButton = self._driver.find_element(
             By.CSS_SELECTOR, "div.x78zum5 > span.xp7jhwk > div"
@@ -45,7 +41,7 @@ class Post(Navigator):
     @check_authorization
     def unlike(self) -> None:
         if not self.is_liked():
-            raise PostActionError("Post is not liked.")
+            raise PostNotLiked()
 
         likeButton = self._driver.find_element(
             By.CSS_SELECTOR, "div.x78zum5 > span.xp7jhwk > div"
@@ -72,8 +68,6 @@ class Post(Navigator):
         elif self._driver.find_elements(By.CSS_SELECTOR, self.unlike_selector):
             self._driver.implicitly_wait(10)
             return True
-        else:
-            raise PostError("Cannot determine if post is liked or not.")
 
     def get_likes(self) -> int:
         pass

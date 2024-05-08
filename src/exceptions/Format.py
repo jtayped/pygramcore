@@ -1,15 +1,11 @@
 from constants import MEDIA_FORMATS
 
 
-class IncorrectFormat(Exception):
-    """Raises when a file is not the correct format"""
+class InvalidFormat(Exception):
+    def __init__(self) -> None:
+        super().__init__(
+            f"Please insert media of an appropriate format ({', '.join(MEDIA_FORMATS)})."
+        )
 
-    def __init__(
-        self,
-        message: str = "The file is not the correct format.",
-        formats: list[str] = MEDIA_FORMATS,
-        *args,
-        **kwargs
-    ) -> None:
-        # TODO: instert the necessary formats in to the message
-        super().__init__(message, *args)
+
+raise InvalidFormat
