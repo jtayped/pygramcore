@@ -6,14 +6,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import time
 
-from elements.Comment import Comment
 from exceptions.Post import *
 from constants import *
-from pygram import get_driver, check_authorization
+from pygram import Navigator, check_authorization
 
 
 @dataclass
-class Post:
+class Post(Navigator):
     id: str
 
     # To identify state of the button
@@ -26,11 +25,13 @@ class Post:
     )
 
     def __post_init__(self):
+        # Init navigator (driver)
+        super().__init__()
+
         self.url = f"{INSTAGRAM_URL}/p/{self.id}"
-        self._driver: webdriver.Chrome = None
+        self._driver.get(self.url)
 
     @check_authorization
-    @get_driver()
     def like(self) -> None:
         if self.is_liked():
             raise PostActionError("Post is already liked.")
@@ -42,7 +43,6 @@ class Post:
         likeButton.click()
 
     @check_authorization
-    @get_driver()
     def unlike(self) -> None:
         if not self.is_liked():
             raise PostActionError("Post is not liked.")
@@ -53,7 +53,6 @@ class Post:
         likeButton.click()
 
     @check_authorization
-    @get_driver()
     def is_liked(self) -> bool:
         """
         Check whether the post is liked.
@@ -82,8 +81,8 @@ class Post:
     def get_images(self) -> list[str]:
         pass
 
-    def get_comments(self, limit=10) -> list[Comment]:
+    def get_comments(self, limit=10) -> list[object]:
         pass
 
-    def comment(self) -> Comment:
+    def comment(self) -> object:
         pass

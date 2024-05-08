@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urlparse
 
-from pygram import get_driver, check_authorization
+from pygram import Navigator, check_authorization
 from elements.Post import Post
 from exceptions.User import *
 from constants import *
@@ -52,7 +52,7 @@ def user_dialog_action(func):
 
 
 @dataclass
-class User:
+class User(Navigator):
     """
     Represents an Instagram user.
 
@@ -63,16 +63,17 @@ class User:
     name: str
 
     def __post_init__(self):
-        self._driver: webdriver.Chrome = None
+        # Init navigator (driver)
+        super().__init__()
+
         self.url = f"{INSTAGRAM_URL}/{self.name}/"
+        self._driver.get(self.url)
 
     @check_authorization
-    @get_driver()
     def is_private(self) -> bool:
         pass
 
     @check_authorization
-    @get_driver()
     def follow(self) -> None:
         if self.is_following():
             raise UserActionError("You already follow this user.")
@@ -81,7 +82,6 @@ class User:
         follow_btn.click()
 
     @check_authorization
-    @get_driver()
     @user_dialog_action
     def unfollow(self) -> None:
         if not self.is_following():
@@ -94,7 +94,6 @@ class User:
         unfollow_btn.click()
 
     @check_authorization
-    @get_driver()
     def is_following(self):
         """
         Check whether you follow the user.
@@ -118,7 +117,6 @@ class User:
             raise UserError("Cannot determine if user is followed or not.")
 
     @check_authorization
-    @get_driver()
     @user_dialog_action
     def add_close_friend(self):
         """
@@ -133,7 +131,6 @@ class User:
         close_friend_btn.click()
 
     @check_authorization
-    @get_driver()
     @user_dialog_action
     def remove_close_friend(self):
         if not self.is_close_friend():
@@ -145,7 +142,6 @@ class User:
         close_friend_btn.click()
 
     @check_authorization
-    @get_driver()
     @user_dialog_action
     def is_close_friend(self):
         self._driver.implicitly_wait(2)
@@ -170,7 +166,6 @@ class User:
             return True
 
     @check_authorization
-    @get_driver()
     @user_dialog_action
     def mute(
         self,
@@ -229,7 +224,6 @@ class User:
         )
         submit_btn.click()
 
-    @get_driver()
     def user_dialog_open(self) -> bool:
         # Check for elements that comply with the CSS selector
         elements = self._driver.find_elements(
@@ -241,7 +235,6 @@ class User:
         is_open = bool(elements)
         return is_open
 
-    @get_driver()
     def get_total_posts(self) -> int:
         posts_span, _, _ = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
         posts_str = posts_span.find_element(By.CSS_SELECTOR, "span").text
@@ -250,7 +243,6 @@ class User:
         followers = int(posts_str.replace(",", ""))
         return followers
 
-    @get_driver()
     def get_followers(self) -> int:
         # Gets the string value (e.g. "156,204")
         _, followers_span, _ = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
@@ -260,7 +252,6 @@ class User:
         followers = int(followers_str.replace(",", ""))
         return followers
 
-    @get_driver()
     def get_following(self) -> int:
         _, _, following_span = self._driver.find_elements(By.CSS_SELECTOR, "span._ac2a")
         following_str = following_span.find_element(By.CSS_SELECTOR, "span").text
@@ -269,11 +260,9 @@ class User:
         followers = int(following_str.replace(",", ""))
         return followers
 
-    @get_driver()
     def send_dm(self, message: str) -> None:
         pass  # TODO
 
-    @get_driver()
     def get_posts(self, reels=True, limit=10) -> list[Post]:
         # Go to user instagram page
         self._driver.get(self.url)

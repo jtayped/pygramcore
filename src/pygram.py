@@ -21,65 +21,40 @@ def check_authorization(func):
     return wrapper
 
 
-def get_driver(url: str = None):
-    def decorator(func):
-        """
-        Passes in the current instance of the driver in an object.
-        """
+def init_driver() -> webdriver.Chrome:
+    options = webdriver.ChromeOptions()
 
-        def wrapper(obj, *args, **kwargs):
-            # Pass in the driver in to the object
-            driver = Account()
-            obj._driver = driver
+    driver = webdriver.Chrome(options=options)
+    stealth(
+        driver,
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+    )
+    driver.implicitly_wait(IMPLICIT_WAIT)
 
-            if url:
-                navigate(obj._driver, url)
-            else:
-                # Check if obj has a URL attribute
-                if hasattr(obj, 'url'):
-                    navigate(obj._driver, obj.url)
-
-            # Run the function and return the value
-            value = func(obj, *args, **kwargs)
-            return value
-
-        return wrapper
-
-    return decorator
+    return driver
 
 
 class Account:
-    _driver: webdriver.Chrome = None
-    _logged_in: bool = False
+    _driver = init_driver()
+    _logged_in = False
 
     def __new__(cls):
         """
         Returns the current instance of the webdriver.
         """
         if cls._driver is None:
-            options = webdriver.ChromeOptions()
-
-            cls._driver = webdriver.Chrome(options=options)
-            stealth(
-                cls._driver,
-                languages=["en-US", "en"],
-                vendor="Google Inc.",
-                platform="Win32",
-                webgl_vendor="Intel Inc.",
-                renderer="Intel Iris OpenGL Engine",
-                fix_hairline=True,
-            )
-
-            # Set initial implicit wait
-            cls._driver.implicitly_wait(IMPLICIT_WAIT)
+            driver = init_driver()
+            cls._driver = driver
 
         return cls._driver
 
     @classmethod
-    @get_driver(INSTAGRAM_LOGIN_URL)
-    def login(
-        cls, email: str | list[dict], password: str = None
-    ) -> list[dict] | None:
+    def login(cls, email: str | list[dict], password: str = None) -> list[dict] | None:
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
 
@@ -122,7 +97,6 @@ class Account:
         return current_cookies
 
     @classmethod
-    @get_driver(INSTAGRAM_URL)
     @check_authorization
     def post(cls, media_path: str, caption: str = None):
         """
@@ -171,24 +145,22 @@ class Account:
             By.CSS_SELECTOR,
             "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div > div > div > div._ap97 > div > div > div > div._ac7b._ac7d > div",
         )
-        # next_btn.click()
+        next_btn.click()
 
     @classmethod
-    @get_driver()
     def get_cookies(cls):
         cookies = cls._driver.get_cookies()
         return cookies
 
     @classmethod
-    @get_driver()
     def set_cookies(cls, cookies: list[dict]):
         cls._driver.delete_all_cookies()
+        cls._driver.get(INSTAGRAM_URL)
 
         for cookie in cookies:
             cls._driver.add_cookie(cookie)
 
     @classmethod
-    @get_driver(INSTAGRAM_URL)
     def load_cookies(cls, path: str):
         with open(path, "rb") as file:
             cookies = pickle.load(file)
@@ -197,8 +169,8 @@ class Account:
         cls._logged_in = bool(cookies)
 
     @classmethod
-    @get_driver()
     def save_cookies(cls, path: str):
+        # TODO: add argument to add custom cookies (which is not required)
         with open(path, "wb") as file:
             pickle.dump(cls.get_cookies(), file)
 
@@ -207,9 +179,6 @@ class Account:
         return cls._logged_in
 
 
-def tests():
-    pass
-
-
-if __name__ == "__main__":
-    tests()
+class Navigator:
+    def __init__(self) -> None:
+        self._driver = Account()
