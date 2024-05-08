@@ -11,7 +11,7 @@ from utils.misc import write
 
 def check_authorization(func):
     def wrapper(*args, **kwargs):
-        logged_in = Account.is_logged_in()
+        logged_in = PyGram.is_logged_in()
         if not logged_in:
             raise NotAuthenticated()
 
@@ -39,11 +39,12 @@ def init_driver() -> webdriver.Chrome:
     return driver
 
 
-class Account:
+class PyGram:
     _driver = init_driver()
     _logged_in = False
-
-    def __new__(cls):
+    
+    @classmethod
+    def get_instance(cls):
         """
         Returns the current instance of the webdriver.
         """
@@ -181,4 +182,4 @@ class Account:
 
 class Navigator:
     def __init__(self) -> None:
-        self._driver = Account()
+        self._driver = PyGram.get_instance()

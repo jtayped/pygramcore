@@ -6,6 +6,3 @@ class InvalidFormat(Exception):
         super().__init__(
             f"Please insert media of an appropriate format ({', '.join(MEDIA_FORMATS)})."
         )
-
-
-raise InvalidFormat
