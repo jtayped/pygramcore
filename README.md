@@ -35,13 +35,13 @@
 
 - **Modular Elements**: Easily use and customize modular elements such as Posts, Comments, and Users.
 
-  - **Users**: Follow, download posts, direct message, and more.
+  - **Users**: Follow, direct message, get posts, and more.
 
-  - **Stories**: Like, download, reply and more.
+  - **Posts**: Like, comment, download, and more.
 
-  - **Posts**: Like, comment, save, download, and more.
+  - **Stories** (Coming soon...)
 
-  - **Comments**: Like, reply, and engage.
+  - **Comments** (Coming soon...)
 
 <div id="how-to-use"></div>
 
