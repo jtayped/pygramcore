@@ -18,7 +18,7 @@ def check_authorization(func):
     """
 
     def wrapper(*args, **kwargs):
-        logged_in = PyGram.is_logged_in()
+        logged_in = Account.is_logged_in()
         if not logged_in:
             raise NotAuthenticated()
 
@@ -84,13 +84,13 @@ class Navigator(type):
         Provides the current instance of the driver to the object and navigates to the URL of it's object if there is any.
         """
         if not hasattr(self, "_driver"):
-            self._driver = PyGram.get_instance()
+            self._driver = Account.get_instance()
 
         if hasattr(self, "url"):
             navigate(self._driver, self.url)
 
 
-class PyGram(metaclass=Navigator):
+class Account(metaclass=Navigator):
     _driver: webdriver.Chrome
     _logged_in: bool = False
 
