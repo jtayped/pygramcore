@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium_stealth import stealth
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import pickle, os, time, random
 
 from .constants import *
@@ -132,12 +133,7 @@ class Account(metaclass=Navigator):
             By.CSS_SELECTOR, "#loginForm > div > div:nth-child(2) > div > label > input"
         )
         write(password_input, password)
-
-        # Login
-        login_btn = cls._driver.find_element(
-            By.CSS_SELECTOR, "#loginForm > div > div:nth-child(3) > button"
-        )
-        login_btn.click()
+        password_input.send_keys(Keys.ENTER)
 
         # Wait till fully logged in
         time.sleep(5)
