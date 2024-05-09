@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
 from urllib.parse import urlparse
 from datetime import datetime
 
@@ -458,6 +459,7 @@ class Post(metaclass=Navigator):
         total_likes = int(likes_element.text.replace(",", ""))
         return total_likes
 
+    @check_authorization
     def get_liked_by(self, limit=25) -> list:
         # Open likes dialog
         likes_element = self._driver.find_element(
@@ -466,34 +468,51 @@ class Post(metaclass=Navigator):
         )
         likes_element.click()
 
-        # Find list of users
-        user_list = self._driver.find_element(
-            By.CSS_SELECTOR,
-            "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div > div.x9f619.xjbqb8w.x78zum5.x168nmei.x13lgxp2.x5pf9jr.xo71vjh.x1uhb9sk.x6ikm8r.x10wlt62.x1iyjqo2.x2lwn1j.xeuugli.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1 > div > div",
-        )
-
-        # Get list of users
+        # Initialize list to store unique users
         users = []
+
         while True:
-            username_elements = user_list.find_elements(
-                By.CSS_SELECTOR, "span._ap3a._aaco._aacw._aacx._aad7._aade"
-            )
-            users = [User(element.text) for element in username_elements]
-            users.extend(users)
+            try:
+                # Find the user list container
+                user_list = self._driver.find_element(
+                    By.CSS_SELECTOR,
+                    "div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div > div.x9f619.xjbqb8w.x78zum5.x168nmei.x13lgxp2.x5pf9jr.xo71vjh.x1uhb9sk.x6ikm8r.x10wlt62.x1iyjqo2.x2lwn1j.xeuugli.xdt5ytf.xqjyukv.x1qjc9v5.x1oa3qoh.x1nhvcw1 > div > div",
+                )
 
-            # Scroll to last element and remove it from the list so in the next
-            # iteration it doesn't add the same user to the list.
-            last_user = username_elements.pop(-1)
-            self._driver.execute_script("arguments[0].scrollIntoView(true);", last_user)
+                # Find all the username elements
+                username_elements = user_list.find_elements(
+                    By.CSS_SELECTOR, "span._ap3a._aaco._aacw._aacx._aad7._aade"
+                )
+            except StaleElementReferenceException:
+                # Wait for the list of users to load
+                time.sleep(1)
 
-            # Check if over the limit
-            if len(users) >= limit:
+                # Retry if stale element exception occurs
+                continue
+
+            # Extract usernames and create User objects
+            new_users = [User(element.text) for element in username_elements]
+
+            # Add unique users to the list
+            for user in new_users:
+                if user.name not in [u.name for u in users]:
+                    users.append(user)
+
+            # Scroll to the last user element to load more users
+            if new_users:
+                last_user = username_elements[-1]
+                self._driver.execute_script(
+                    "arguments[0].scrollIntoView(true);", last_user
+                )
+
+            # Check if the limit is reached or no new users are loaded
+            if len(users) >= limit or not new_users:
                 break
 
-        # Close dialog by refreshing
+        # Close the dialog by refreshing the page
         self._driver.refresh()
 
-        # Return necessary amount of users
+        # Return the necessary number of users within the limit
         return users[:limit]
 
     @check_authorization
