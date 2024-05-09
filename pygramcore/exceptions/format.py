@@ -1,4 +1,4 @@
-from constants import MEDIA_FORMATS
+from ..constants import MEDIA_FORMATS
 
 
 class InvalidFormat(Exception):
