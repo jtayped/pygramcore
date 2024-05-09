@@ -14,14 +14,14 @@ def navigate(driver: webdriver.Chrome, url: str):
     driver.get(url)
 
 
-def write(input, text, speed=3):
+def write(input, text, speed=5):
     """
     Types some text letter by letter at random intervals in an input field. This is done so the interaction feels more "human-like".
 
     Args:
         input (WebElement): The input to write in.
-        text (str): Text being written.
-        speed (int): Divides the random float (from 0 to 1). The higher the number the faster it writes.
+        text (str): Text to be written.
+        speed (int): Divides the random float (from 0 to 1). The higher the number the faster it writes. Defaults to 5.
     """
     for letter in text:
         input.send_keys(letter)
