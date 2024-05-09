@@ -2,7 +2,7 @@
   <br>
   <img src="/images/icon.png" alt="PyGramCore" width="200">
   <br>
-  📷 PyGramCore
+  📷 pygramcore
   <br>
 </h1>
 
