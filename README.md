@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="/images/icon.png" alt="PyGramCore" width="200">
+  <img src="https://github.com/jtayped/pygramcore/blob/40436d7b57e247742b1697a88e52f06821e2f9f8/images/icon.png" alt="PyGramCore" width="200">
   <br>
   📷 pygramcore
   <br>
@@ -8,20 +8,20 @@
 
 <h4 align="center">An easy-to-use Instagram SDK using <a href="https://www.selenium.dev/" target="_blank">Selenium</a>.</h4>
 
-<p align="center">
+<div align="center">
   <a href="https://pypi.org/project/PyGramCore/">
     <img src="https://img.shields.io/pypi/v/pygramcore?style=for-the-badge">
   </a>
-  <a href="/LICENSE">
-      <img src="https://img.shields.io/github/license/jtayped/pygramcore?style=for-the-badge" alt="License">
+  <a href="https://github.com/jtayped/pygramcore/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/jtayped/pygramcore?style=for-the-badge" alt="License">
   </a>
-    <a href="/issues">
-      <img src="https://img.shields.io/github/issues/jtayped/pygramcore?style=for-the-badge" alt="License">
+  <a href="https://github.com/jtayped/pygramcore/issues">
+    <img src="https://img.shields.io/github/issues/jtayped/pygramcore?style=for-the-badge" alt="License">
   </a>
   <a href="https://www.linkedin.com/in/jtayped/">
-      <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
   </a>
-</p>
+</div>
 
 <p align="center">
   <a href="#key-features">Key Features</a> •
