@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://github.com/jtayped/pygramcore/blob/40436d7b57e247742b1697a88e52f06821e2f9f8/images/icon.png" alt="PyGramCore" width="200">
+  <img src="https://github.com/jtayped/pygramcore/blob/main/images/icon.png?raw=true" alt="PyGramCore" width="200">
   <br>
   📷 pygramcore
   <br>
@@ -23,11 +23,11 @@
   </a>
 </div>
 
-<p align="center">
+<div align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#how-to-use">How To Use</a> •
   <a href="#related">Related</a>
-</p>
+</div>
 
 <div id="key-features"></div>
 
