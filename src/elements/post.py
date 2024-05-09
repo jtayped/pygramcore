@@ -7,7 +7,7 @@ from datetime import datetime
 
 from pygram import Navigator, check_authorization
 from exceptions.post import *
-from utils.misc import *
+from utils import *
 from constants import *
 
 
