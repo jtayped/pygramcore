@@ -5,7 +5,7 @@ from os import path
 # Read version from VERSION file
 here = path.abspath(path.dirname(__file__))
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 DESCRIPTION = "A simple-to-use Instagram Python interface using Selenium."
 
 # Get the long description from the README file
