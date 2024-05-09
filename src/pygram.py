@@ -256,3 +256,17 @@ class Account(metaclass=Navigator):
             bool: Whether the account is logged in.
         """
         return cls._logged_in
+
+
+def attempt_close_notification_dialog():
+    driver = Account.get_instance()
+
+    # Attempt to find the button
+    driver.implicitly_wait(2)
+    found = driver.find_elements(By.XPATH, '//button[text()="Not Now"]')
+    driver.implicitly_wait(IMPLICIT_WAIT)
+
+    # If found it shall click it
+    if found:
+        btn = found[0]
+        btn.click()

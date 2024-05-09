@@ -6,10 +6,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urlparse
+import time
 
-from pygram import Navigator, check_authorization
+from pygram import *
 from exceptions.user import *
+from utils import *
 from constants import *
+
 
 def user_dialog_action(func):
     """
@@ -309,7 +312,22 @@ class User(metaclass=Navigator):
         return followers
 
     def send_dm(self, message: str) -> None:
-        pass  # TODO
+        # Enter the DMs
+        message_btn = self._driver.find_element(By.XPATH, '//div[text()="Message"]')
+        message_btn.click()
+
+        # Write the the message
+        message_input = self._driver.find_element(
+            By.XPATH,
+            '//div[@aria-describedby="Message"]',
+        )
+        write(message_input, message)
+
+        # Send message
+        message_input = message_input.send_keys(Keys.ENTER)
+
+        # Wait for message to send, moving on immediately after doesn't send the message
+        time.sleep(0.5)
 
     def get_posts(self, reels=True, limit=25) -> list:
         """
