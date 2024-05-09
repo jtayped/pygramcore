@@ -90,8 +90,12 @@ posts = user.get_posts(limit=50)
 
 # Like the first 10 posts in the user's feed
 for post in posts[:10]:
-  post.like()
+  # Get URLs of the images in the post
+  urls = post.get_images()
+
+  # Like & comment the post
   post.comment("Nice post!")
+  post.like()
 ```
 
 Please refer to the docs for more.
