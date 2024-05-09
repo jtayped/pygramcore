@@ -202,7 +202,7 @@ class Post(metaclass=Navigator):
             # or the post is of a single image (not a carousel)
             if len(new_image_urls) <= 1:
                 break
-            
+
             # An image loads on each side of the current index of a post, so to get the
             # next two posts, it shall double click the next button
             next_btn = self._driver.find_element(
