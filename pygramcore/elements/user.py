@@ -108,10 +108,10 @@ class User(metaclass=Navigator):
     @check_authorization
     def is_following(self):
         """
-        Check whether you follow the user.
+        Check whether the account logged in follows the user.
 
         Returns:
-            bool: True if the user is followed, False if not.
+            bool: whether the account logged in follows the user.
 
         Raises:
             NotAuthenticated: Raises when the current account is not logged in.
@@ -312,6 +312,12 @@ class User(metaclass=Navigator):
         return followers
 
     def send_dm(self, message: str) -> None:
+        """
+        Send a DM (direct message) to the user.
+
+        Args:
+            message (str): Message to send the user.
+        """
         # Enter the DMs
         message_btn = self._driver.find_element(By.XPATH, '//div[text()="Message"]')
         message_btn.click()
