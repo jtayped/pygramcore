@@ -94,6 +94,8 @@ class Account(metaclass=Navigator):
     _driver: webdriver.Chrome
     _logged_in: bool = False
 
+    url: str = INSTAGRAM_URL
+
     @classmethod
     def get_instance(cls):
         """
@@ -106,18 +108,18 @@ class Account(metaclass=Navigator):
         return cls._driver
 
     @classmethod
-    def login(cls, email: str | list[dict], password: str = None) -> list[dict] | None:
+    def login(cls, email: str | list[dict], password: str) -> list[dict]:
         """
         Uses the Instagram UI to log in. It will require user interaction to get past CAPTCHAs and the sort.
 
         Returns:
             list[dict]: list of cookies.
         """
-        # Check if email/password exist
-        if not (email and password):
-            raise ValueError(
-                "Missing email or password. If no cookies are given, please insert both."
-            )
+        # If an account is already authenticated, it should remove all cookies
+        # and refresh the browser to access the instagram login page.
+        if cls.is_logged_in():
+            cls._driver.delete_all_cookies()
+            cls._driver.refresh()
 
         # Write email
         email_input = cls._driver.find_element(
