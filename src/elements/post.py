@@ -181,15 +181,43 @@ class Post(metaclass=Navigator):
         Raises:
             NotAuthenticated: Raises when the current account is not logged in.
         """
-        image_elements = self._driver.find_elements(By.CSS_SELECTOR, "li._acaz")
+        image_urls = []
+        while True:
+            image_list_elements = self._driver.find_element(
+                By.XPATH,
+                '//div[@class="x6s0dn4 x1dqoszc xu3j5b3 xm81vs4 x78zum5 x1iyjqo2 x1tjbqro"]',
+            )
 
-        urls = []
-        for element in image_elements:
-            image_element = element.find_element(By.TAG_NAME, "img")
-            image_url = image_element.get_attribute("src")
-            urls.append(image_url)
+            images = image_list_elements.find_elements(By.TAG_NAME, "img")
 
-        return urls
+            new_image_urls = []
+            for image in images:
+                url = image.get_attribute("src")
+                if url not in image_urls:
+                    new_image_urls.append(url)
+
+            image_urls.extend(new_image_urls)
+
+            # Finding 1 image or less means that either there are no more posts in the list
+            # or the post is of a single image (not a carousel)
+            if len(new_image_urls) <= 1:
+                break
+            
+            # An image loads on each side of the current index of a post, so to get the
+            # next two posts, it shall double click the next button
+            next_btn = self._driver.find_element(
+                By.XPATH, '//button[@aria-label="Next"][@class=" _afxw _al46 _al47"]'
+            )
+            next_btn.click()
+
+            # On the last image the next button will dissapear, so if it tries to click it
+            # it will trigger the StaleElementReferenceException.
+            try:
+                next_btn.click()
+            except StaleElementReferenceException:
+                continue
+
+        return image_urls
 
     @check_authorization
     def comment(self, text: str):
