@@ -13,7 +13,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()
 
 setup(
-    name="PyGramCore",
+    name="pygramcore",
     version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
