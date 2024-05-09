@@ -322,7 +322,7 @@ class User(metaclass=Navigator):
 
         Args:
             reels (bool, optional): Whether to include reels or not. Defaults to True.
-            limit (int, optional): Limits the amount of posts to retrieve. Defaults to 25.
+            limit (int, optional): Limits the amount of posts to retrieve. Defaults to 25 and can't be above 100.
 
         Returns:
             list[Post]: List of post objects
@@ -461,6 +461,21 @@ class Post(metaclass=Navigator):
 
     @check_authorization
     def get_liked_by(self, limit=25) -> list:
+        """
+        Gets the list of users the post was liked by.
+
+        Args:
+            limit (int): Maximum number of users. Defaults to 25 and can't be above 100.
+        
+        Returns:
+            list[User]: List of Users.
+
+        Raises:
+            TooManyUsers: Raises when the limit is above 100.
+        """
+        if limit > 100:
+            raise TooManyUsers()
+        
         # Open likes dialog
         likes_element = self._driver.find_element(
             By.XPATH,
