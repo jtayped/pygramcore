@@ -98,7 +98,7 @@ for post in posts[:10]:
   post.like()
 ```
 
-Please refer to the docs for more.
+Please refer to the [docs](https://github.com/jtayped/pygramcore/tree/main/docs) for more.
 
 <div id="related"></div>
 
