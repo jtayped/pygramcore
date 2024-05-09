@@ -5,10 +5,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime
 
-from pygram import Navigator, check_authorization
-from exceptions.post import *
-from utils import *
-from constants import *
+from ..pygram import Navigator, check_authorization
+from ..exceptions.post import *
+from ..utils import *
+from ..constants import *
 
 
 @dataclass

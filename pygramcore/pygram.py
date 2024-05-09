@@ -3,10 +3,10 @@ from selenium_stealth import stealth
 from selenium.webdriver.common.by import By
 import pickle, os, time, random
 
-from constants import *
-from exceptions.auth import *
-from exceptions.format import *
-from utils.misc import write, navigate
+from .constants import *
+from .exceptions.auth import *
+from .exceptions.format import *
+from .utils.misc import write, navigate
 
 
 def check_authorization(func):

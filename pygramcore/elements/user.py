@@ -8,10 +8,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urlparse
 import time
 
-from pygram import *
-from exceptions.user import *
-from utils import *
-from constants import *
+from ..pygram import *
+from ..exceptions.user import *
+from ..utils import *
+from ..constants import *
 
 
 def user_dialog_action(func):
