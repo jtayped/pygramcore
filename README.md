@@ -103,7 +103,7 @@ Please refer to the [docs](https://github.com/jtayped/pygramcore/tree/main/docs)
 <div id="related"></div>
 
 ## ❓ About the Project
-This Python package was created as a fun project to enhance my proficiency in writing professional Python code, building packages, implementing semantic versioning, and ensuring code maintainability.
+This Python package was created as a fun project to enhance my proficiency in writing "professional" Python code, building packages, implementing semantic versioning, and ensuring code maintainability.
 I am still a relatively new developer, and I welcome any contributions and feedback to help me improve.
 It is important to note that this project is not intended to replace essential packages such as [InstaPy](https://github.com/InstaPy/InstaPy), nor do I anticipate that it will.
 
