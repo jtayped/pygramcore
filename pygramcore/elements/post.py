@@ -111,7 +111,7 @@ class Post(metaclass=Navigator):
         Raises:
             TooManyUsers: Raises when the limit is above 100.
         """
-        from elements import User
+        from .user import User
 
         if limit > 100:
             raise TooManyUsers()
@@ -231,7 +231,6 @@ class Post(metaclass=Navigator):
             CannotComment: Whether you can comment.
             NotAuthenticated: Raises when the current account is not logged in.
         """
-        # TODO: when comment implementation done continue...
         if not self.can_comment():
             raise CannotComment()
 

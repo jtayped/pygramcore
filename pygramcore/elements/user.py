@@ -357,7 +357,7 @@ class User(metaclass=Navigator):
             post.like()
         ```
         """
-        from elements import Post
+        from .post import Post
 
         css_selector = "a[href^='/p/']"
         if reels:
