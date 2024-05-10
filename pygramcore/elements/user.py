@@ -69,7 +69,17 @@ class User(metaclass=Navigator):
 
     @check_authorization
     def is_private(self) -> bool:
-        pass
+        self._driver.implicitly_wait(4)
+
+        # Attempt to find the div that contains "This account is private"
+        elements_found = self._driver.find_elements(
+            By.XPATH,
+            '//div[@class="x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x1uhb9sk x1plvlek xryxfnj x1c4vz4f x2lah0s x1q0g3np xqjyukv x6s0dn4 x1oa3qoh x1nhvcw1"]',
+        )
+
+        self._driver.implicitly_wait(IMPLICIT_WAIT)
+
+        return bool(elements_found)
 
     @check_authorization
     def follow(self) -> None:
