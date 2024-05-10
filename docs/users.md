@@ -19,6 +19,18 @@ if followers > 100:
 	user.send_dm("Hi! How is it going?")
 ```
 
+## .is_private()
+
+Checks if the user has a private account.
+
+Returns:
+
+- `bool`: Whether the account is private.
+
+Raises:
+
+- `NotAuthenticated`: Raises when the current account is not logged in.
+
 ## .follow()
 
 Follows the user with the current account logged in.

@@ -69,6 +69,15 @@ class User(metaclass=Navigator):
 
     @check_authorization
     def is_private(self) -> bool:
+        """
+        Checks if the user has a private account.
+
+        Returns:
+            bool: Whether the account is private.
+
+        Raises:
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
         self._driver.implicitly_wait(4)
 
         # Attempt to find the div that contains "This account is private"
