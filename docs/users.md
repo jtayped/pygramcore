@@ -48,6 +48,7 @@ Raises:
 
 - `UserNotFollowed`: Raises when the user is not followed. Use `.is_followed()` to check if followed.
 - `NotAuthenticated`: Raises when the current account is not logged in.
+- `UserIsPrivate`: Raises when the user is private.
 
 ## .is_following()
 
@@ -69,6 +70,7 @@ Raises:
 
 - `UserCloseFriend`: Raises when the user is already a close friend.
 - `NotAuthenticated`: Raises when the current account is not logged in.
+- `UserNotFollowed`: Raises when the user is not followed.
 
 ## .remove_close_friend()
 
@@ -144,6 +146,11 @@ Send a DM (direct message) to the user.
 Args:
 `message` (str): Message to send the user.
 
+Raises:
+
+- `NotAuthenticated`: Raises when the current account is not logged in.
+- `UserIsPrivate`: Raises when the user is private.
+
 ## .get_posts(reels=True, limit=25)
 
 Get a list of posts from the user's account.
@@ -167,3 +174,7 @@ posts = user.get_posts()
 for post in posts[:3]:
 	post.like()
 ```
+
+Raises:
+
+- `UserIsPrivate`: Raises when the user is private.
