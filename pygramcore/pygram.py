@@ -7,6 +7,7 @@ import pickle, os, time, random
 from .constants import *
 from .exceptions.auth import *
 from .exceptions.format import *
+from .exceptions.navigation import *
 from .utils.navigation import *
 
 
@@ -50,7 +51,7 @@ def init_driver() -> webdriver.Chrome:
 class Navigator(type):
     def __new__(cls, name, bases, dct):
         """
-        Wraps all relevant functions with _default_initialize_website to initialize the object's url and provide the current instance of the driver.
+        Wraps all relevant functions with necessary wrapper functions.
         """
         fn_black_list = [
             "get_instance",
@@ -62,6 +63,7 @@ class Navigator(type):
         _initialize_website = dct.get(
             "_initialize_website", cls._default_initialize_website
         )
+
         for key, value in dct.items():
             if not key.startswith("__") and key not in fn_black_list:
                 # Support for class methods that aren't the get_instance function.
@@ -96,6 +98,46 @@ class Navigator(type):
 
         if hasattr(self, "url"):
             navigate(self._driver, self.url)
+
+            # Check if the URL has been found.
+            self._driver.implicitly_wait(2)
+            found_not_found_text = bool(
+                self._driver.find_elements(
+                    By.XPATH, '//span[text()="Sorry, this page isn\'t available."]'
+                )
+            )
+            self._driver.implicitly_wait(IMPLICIT_WAIT)
+
+            # Check if the text has not been found. If so, it should raise the
+            # PageNotFound exception.
+            if found_not_found_text:
+                raise PageNotFound(self._driver.current_url)
+
+    @classmethod
+    def _check_page_found(self):
+        """
+        Check if the current page has been found.
+
+        Raises:
+            PageNotFound: Raises when page wasn't found.
+        """
+        driver = Account.get_instance()
+
+        driver.implicitly_wait(2)
+
+        print("checking shit")
+        found_not_found_text = bool(
+            driver.find_elements(
+                By.XPATH, '//span[text()="Sorry, this page isn\'t available."]'
+            )
+        )
+
+        driver.implicitly_wait(IMPLICIT_WAIT)
+
+        # Check if the text has not been found. If so, it should raise the
+        # PageNotFound exception.
+        if not found_not_found_text:
+            raise PageNotFound(driver.current_url)
 
 
 class Account(metaclass=Navigator):
