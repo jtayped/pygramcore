@@ -127,3 +127,15 @@ Gets the date the the post was published.
 Returns:
 
 - `datetime`: Publish date.
+
+## .get_author()
+
+Finds the user who created the post.
+
+Returns:
+
+- `User`: Author's user object.
+
+Raises:
+
+- `NotAuthenticated`: Raises when the current account is not logged in.

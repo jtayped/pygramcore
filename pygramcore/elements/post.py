@@ -269,6 +269,28 @@ class Post(metaclass=Navigator):
         return bool(found_elements)
 
     @check_authorization
+    def get_author(self):
+        """
+        Finds the user who created the post.
+
+        Returns:
+            User: Author's user object.
+
+        Raises:
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
+        # To prevent from circular import
+        from .user import User
+
+        username = self._driver.find_element(
+            By.XPATH,
+            '//div[@class="xyinxu5 x1pi30zi x1g2khh7 x1swvt13"]//span[@class="_ap3a _aaco _aacw _aacx _aad7 _aade"]',
+        ).text
+
+        user = User(username)
+        return user
+
+    @check_authorization
     def get_date_posted(self) -> datetime:
         """
         Gets the date the the post was published.
