@@ -7,7 +7,7 @@ import pickle, os, time, random
 from .constants import *
 from .exceptions.auth import *
 from .exceptions.format import *
-from .utils.misc import write, navigate
+from .utils.navigation import *
 
 
 def check_authorization(func):
