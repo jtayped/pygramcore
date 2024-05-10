@@ -52,6 +52,42 @@ def user_dialog_action(func):
     return wrapper
 
 
+def check_private(func):
+    """
+    Decorator that checks if a user is private.
+
+    Raises:
+        UserIsPrivate: Raises whent the user is private
+    """
+
+    def wrapper(user: "User", *args, **kwargs):
+        if user.is_private():
+            raise UserIsPrivate(user.name)
+
+        value = func(user, *args, **kwargs)
+        return value
+
+    return wrapper
+
+
+def check_following(func):
+    """
+    Decorator that checks if the logged in account follows the user.
+
+    Raises:
+        UserNotFollowed: Raises when the user is not followed.
+    """
+
+    def wrapper(user: "User", *args, **kwargs):
+        if not user.is_following():
+            raise UserNotFollowed(user.name)
+
+        value = func(user, *args, **kwargs)
+        return value
+
+    return wrapper
+
+
 @dataclass
 class User(metaclass=Navigator):
     """
@@ -106,18 +142,18 @@ class User(metaclass=Navigator):
         follow_btn.click()
 
     @check_authorization
+    @check_private
+    @check_following
     @user_dialog_action
-    def unfollow(self) -> None:
+    def unfollow(self):
         """
         Unfollows the user with the current account logged in.
 
         Raises:
             UserNotFollowed: Raises when the user is not followed. Use `.is_followed()` to check if followed.
             NotAuthenticated: Raises when the current account is not logged in.
+            UserIsPrivate: Raises when the user is private.
         """
-        if not self.is_following():
-            raise UserNotFollowed(self.name)
-
         unfollow_btn = self._driver.find_element(
             By.CSS_SELECTOR,
             "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div:nth-child(8)",
@@ -146,6 +182,8 @@ class User(metaclass=Navigator):
             return True
 
     @check_authorization
+    @check_private
+    @check_following
     @user_dialog_action
     def add_close_friend(self):
         """
@@ -154,6 +192,7 @@ class User(metaclass=Navigator):
         Raises:
             UserCloseFriend: Raises when the user is already a close friend.
             NotAuthenticated: Raises when the current account is not logged in.
+            UserNotFollowed: Raises when the user is not followed.
         """
         if self.is_close_friend():
             raise UserCloseFriend(self.name)
@@ -164,6 +203,7 @@ class User(metaclass=Navigator):
         close_friend_btn.click()
 
     @check_authorization
+    @check_following
     @user_dialog_action
     def remove_close_friend(self):
         """
@@ -172,6 +212,7 @@ class User(metaclass=Navigator):
         Raises:
             UserNotCloseFriend: Raises when the user is not close friends already.
             NotAuthenticated: Raises when the current account is not logged in.
+            UserNotFollowed: Raises when the user is not followed.
         """
         if not self.is_close_friend():
             raise UserNotCloseFriend(self.name)
@@ -182,6 +223,7 @@ class User(metaclass=Navigator):
         close_friend_btn.click()
 
     @check_authorization
+    @check_following
     @user_dialog_action
     def is_close_friend(self) -> bool:
         """
@@ -192,6 +234,7 @@ class User(metaclass=Navigator):
 
         Raises:
             NotAuthenticated: Raises when the current account is not logged in.
+            UserNotFollowed: Raises when the user is not followed.
         """
         self._driver.implicitly_wait(2)
 
@@ -215,6 +258,7 @@ class User(metaclass=Navigator):
             return True
 
     @check_authorization
+    @check_following
     @user_dialog_action
     def mute(
         self,
@@ -235,6 +279,7 @@ class User(metaclass=Navigator):
         Raises:
             ValueError: if a mode in the arguments does not exist.
             NotAuthenticated: Raises when the current account is not logged in.
+            UserNotFollowed: Raises when the user is not followed.
         """
         if isinstance(modes[0], str):
             modes = list(modes)
@@ -330,12 +375,18 @@ class User(metaclass=Navigator):
         followers = int(following_str.replace(",", ""))
         return followers
 
+    @check_authorization
+    @check_private
     def send_dm(self, message: str) -> None:
         """
         Send a DM (direct message) to the user.
 
         Args:
             message (str): Message to send the user.
+
+        Raises:
+            NotAuthenticated: Raises when the current account is not logged in.
+            UserIsPrivate: Raises when the user is private.
         """
         # Enter the DMs
         message_btn = self._driver.find_element(By.XPATH, '//div[text()="Message"]')
@@ -354,6 +405,7 @@ class User(metaclass=Navigator):
         # Wait for message to send, moving on immediately after doesn't send the message
         time.sleep(0.5)
 
+    @check_private
     def get_posts(self, reels=True, limit=25) -> list:
         """
         Get a list of posts from the user's account.
@@ -375,6 +427,9 @@ class User(metaclass=Navigator):
         for post in posts[:3]:
             post.like()
         ```
+
+        Raises:
+            UserIsPrivate: Raises when the user is private.
         """
         from .post import Post
 
