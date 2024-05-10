@@ -52,15 +52,22 @@ class Navigator(type):
         """
         Wraps all relevant functions with _default_initialize_website to initialize the object's url and provide the current instance of the driver.
         """
+        fn_black_list = [
+            "get_instance",
+            "_initialize_website",
+            "is_logged_in",
+            "save_cookies",
+        ]
+
         _initialize_website = dct.get(
             "_initialize_website", cls._default_initialize_website
         )
         for key, value in dct.items():
-            if not key.startswith("__") and key != "_initialize_website":
+            if not key.startswith("__") and key not in fn_black_list:
                 # Support for class methods that aren't the get_instance function.
                 # This is done to prevent a recursion error, because the get_instance
                 # function is the function used in _initialize_website (causing the error)
-                if isinstance(value, classmethod) and key != "get_instance":
+                if isinstance(value, classmethod):
                     wrapped_method = classmethod(
                         cls.wrap_method(value.__func__, _initialize_website)
                     )
