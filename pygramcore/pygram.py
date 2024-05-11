@@ -100,7 +100,7 @@ class Navigator(type):
             navigate(self._driver, self.url)
 
             # Check if the URL has been found.
-            self._driver.implicitly_wait(2)
+            self._driver.implicitly_wait(1)
             found_not_found_text = bool(
                 self._driver.find_elements(
                     By.XPATH, '//span[text()="Sorry, this page isn\'t available."]'
