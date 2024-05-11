@@ -229,7 +229,6 @@ class User(metaclass=Navigator):
         close_friend_btn.click()
 
     @check_authorization
-    @check_following
     @user_dialog_action
     def is_close_friend(self) -> bool:
         """
@@ -240,8 +239,11 @@ class User(metaclass=Navigator):
 
         Raises:
             NotAuthenticated: Raises when the current account is not logged in.
-            UserNotFollowed: Raises when the user is not followed.
         """
+        # A user isn't a close friend if not followed in the first place
+        if not self.is_following():
+            return False
+        
         self._driver.implicitly_wait(2)
 
         # Check if not close friend
