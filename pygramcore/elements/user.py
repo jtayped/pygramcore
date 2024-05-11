@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 import time
 
 from ..pygram import *
@@ -101,7 +101,11 @@ class User(metaclass=Navigator):
 
     def __post_init__(self):
         self._driver: webdriver.Chrome
-        self.url = f"{INSTAGRAM_URL}/{self.name}/"
+
+    @property
+    def url(self):
+        url = urljoin(INSTAGRAM_URL, self.name)
+        return url
 
     @check_authorization
     def is_private(self) -> bool:

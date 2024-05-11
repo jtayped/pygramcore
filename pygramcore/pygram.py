@@ -266,7 +266,7 @@ class Account(metaclass=Navigator):
             cookies (list[dict]): List of cookies from `.get_cookies()`.
         """
         cls._driver.delete_all_cookies()
-        cls._driver.get(INSTAGRAM_URL)
+        navigate(cls._driver, INSTAGRAM_URL)
 
         for cookie in cookies:
             cls._driver.add_cookie(cookie)

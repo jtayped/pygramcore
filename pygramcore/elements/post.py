@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime
+from urllib.parse import urljoin
 
 from ..pygram import Navigator, check_authorization
 from ..exceptions.post import *
@@ -17,7 +18,11 @@ class Post(metaclass=Navigator):
 
     def __post_init__(self):
         self._driver: webdriver.Chrome
-        self.url = f"{INSTAGRAM_URL}/p/{self.id}"
+
+    @property
+    def url(self):
+        url = urljoin(INSTAGRAM_URL, f"/p/{self.id}")
+        return url
 
     @check_authorization
     def like(self) -> None:
