@@ -11,19 +11,6 @@ class TestUser:
     def test_follow(self, user: User):
         was_following = user.is_following()
 
-        # Test exceptions
-        with pytest.raises(UserAlreadyFollowed):
-            if not was_following:
-                user.follow()
-
-            user.follow()
-
-        with pytest.raises(UserNotFollowed):
-            if was_following:
-                user.unfollow()
-
-            user.unfollow()
-
         # Toggle follow options
         if was_following:
             user.unfollow()
@@ -32,8 +19,17 @@ class TestUser:
             user.follow()
             user.unfollow()
 
-        # Reset follow state
-        if was_following and not user.is_following():
+        # Test exceptions
+        with pytest.raises(UserAlreadyFollowed):
+            if not was_following:
+                user.follow()
+
             user.follow()
-        elif not was_following and user.is_following():
+
+        with pytest.raises(UserNotFollowed):
             user.unfollow()
+            user.unfollow()
+
+        # Reset follow state (cleanup)
+        if was_following:
+            user.follow()
