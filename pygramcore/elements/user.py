@@ -37,6 +37,8 @@ def user_dialog_action(func):
         # Attempt to close the user dialog, some actions
         # close the dialog automatically (e.g. unfollowing)
         try:
+            user._driver.implicitly_wait(0)
+
             close_btn = user._driver.find_element(
                 By.CSS_SELECTOR,
                 "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div.x78zum5.xds687c.x1iorvi4.x1sxyh0.xjkvuk6.xurb0ha.x10l6tqk.x1vjfegm > div > div > svg",
@@ -118,7 +120,7 @@ class User(metaclass=Navigator):
         Raises:
             NotAuthenticated: Raises when the current account is not logged in.
         """
-        self._driver.implicitly_wait(4)
+        self._driver.implicitly_wait(2)
 
         # Attempt to find the div that contains "This account is private"
         elements_found = self._driver.find_elements(
@@ -327,10 +329,12 @@ class User(metaclass=Navigator):
         Returns:
             bool: Whether the dialog is open
         """
+        self._driver.implicitly_wait(2)
         elements = self._driver.find_elements(
             By.CSS_SELECTOR,
             "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div.x9f619.xjbqb8w.x78zum5.x168nmei.x13lgxp2.x5pf9jr.xo71vjh.xyamay9.x1pi30zi.x1l90r2v.x1swvt13.x1uhb9sk.x1plvlek.xryxfnj.x1c4vz4f.x2lah0s.xdt5ytf.xqjyukv.x6s0dn4.x1oa3qoh.x1nhvcw1 > span",
         )
+        self._driver.implicitly_wait(IMPLICIT_WAIT)
 
         # Return whether any elements are in the list (found or not)
         is_open = bool(elements)
