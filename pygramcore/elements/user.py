@@ -26,7 +26,7 @@ def user_dialog_action(func):
 
         # Raises a click interception error if the dialog was open already
         try:
-            user.open_user_dialog()
+            user.__open_user_dialog()
         except ElementClickInterceptedException:
             pass
 
@@ -37,7 +37,7 @@ def user_dialog_action(func):
         # close the dialog automatically (e.g. unfollowing)
         try:
             user._driver.implicitly_wait(0)
-            user.close_user_dialog()
+            user.__close_user_dialog()
         except:
             pass
         finally:
@@ -197,7 +197,7 @@ class User(metaclass=Navigator):
         """
         if self.is_close_friend():
             raise UserCloseFriend(self.name)
-        self.open_user_dialog()
+        self.__open_user_dialog()
 
         close_friend_btn = self._driver.find_element(
             By.CSS_SELECTOR, 'svg[aria-label="Close friend"]'
@@ -218,7 +218,7 @@ class User(metaclass=Navigator):
         """
         if not self.is_close_friend():
             raise UserNotCloseFriend(self.name)
-        self.open_user_dialog()
+        self.__open_user_dialog()
 
         close_friend_btn = self._driver.find_element(
             By.CSS_SELECTOR, "svg[aria-label='Close friend']"
@@ -444,11 +444,11 @@ class User(metaclass=Navigator):
 
         return posts[:limit]
 
-    def open_user_dialog(self):
+    def __open_user_dialog(self):
         dialog_btn = self._driver.find_element(By.XPATH, '//div[text()="Following"]')
         dialog_btn.click()
 
-    def close_user_dialog(self):
+    def __close_user_dialog(self):
         close_btn = self._driver.find_element(
             By.CSS_SELECTOR,
             'svg[aria-label="Close"]',
