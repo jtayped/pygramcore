@@ -243,27 +243,15 @@ class User(metaclass=Navigator):
         # A user isn't a close friend if not followed in the first place
         if not self.is_following():
             return False
-        
-        self._driver.implicitly_wait(2)
-
-        # Check if not close friend
-        elements = self._driver.find_elements(
-            By.XPATH, '//svg[contains(@class,"x5n08af")][@width="16"]'
-        )
-
-        if elements:
-            self._driver.implicitly_wait(IMPLICIT_WAIT)
-            return False
 
         # Check if already close friend
-        elements = self._driver.find_elements(
-            By.XPATH,
-            '//svg[contains(@class,"x1g9anri")]',
+        element = self._driver.find_element(
+            By.CSS_SELECTOR,
+            'svg[aria-label="Close friend"]',
         )
 
-        if elements:
-            self._driver.implicitly_wait(IMPLICIT_WAIT)
-            return True
+        classes = element.get_attribute("class").split(" ")
+        return "x1g9anri" in classes
 
     @check_authorization
     @check_following
