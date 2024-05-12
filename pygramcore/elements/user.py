@@ -23,10 +23,6 @@ def user_dialog_action(func):
         if not user.is_following():
             raise UserNotFollowed(user.name)
 
-        # Check if it's not already open
-        if user.user_dialog_open():
-            return
-
         # Open the dialog
         dialog_btn = user._driver.find_element(By.XPATH, '//div[text()="Following"]')
         dialog_btn.click()
