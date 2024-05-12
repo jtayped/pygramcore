@@ -138,7 +138,9 @@ class User(metaclass=Navigator):
         if self.is_following():
             raise UserAlreadyFollowed(self.name)
 
-        follow_btn = self._driver.find_element(By.XPATH, '//div[text()="Follow"]')
+        follow_btn = self._driver.find_element(
+            By.XPATH, '//button[@class=" _acan _acap _acas _aj1- _ap30"]'
+        )
         follow_btn.click()
 
     @check_authorization
@@ -172,7 +174,7 @@ class User(metaclass=Navigator):
             NotAuthenticated: Raises when the current account is not logged in.
         """
         follow_btn = self._driver.find_element(
-            By.CSS_SELECTOR, "button._acan._acap._acat._aj1-._ap30"
+            By.XPATH, '//button[@class=" _acan _acap _acas _aj1- _ap30"]'
         )
 
         state = follow_btn.find_element(By.XPATH, '//div[@dir="auto"]').text
