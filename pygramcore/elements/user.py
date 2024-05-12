@@ -174,12 +174,13 @@ class User(metaclass=Navigator):
             NotAuthenticated: Raises when the current account is not logged in.
         """
         follow_btn = self._driver.find_element(
-            By.XPATH, '//button[@class=" _acan _acap _acas _aj1- _ap30"]'
+            By.CSS_SELECTOR, "button._acan._acap._aj1-._ap30"
         )
+        classes = follow_btn.get_attribute("class")
 
-        state = follow_btn.find_element(By.XPATH, '//div[@dir="auto"]').text
-
-        return state == "Following"
+        # "_acat" when following
+        # "_acas" when not
+        return "_acat" in classes
 
     @check_authorization
     @check_private
@@ -246,7 +247,7 @@ class User(metaclass=Navigator):
             'svg[aria-label="Close friend"]',
         )
 
-        classes = close_friends_icon.get_attribute("class").split(" ")
+        classes = close_friends_icon.get_attribute("class")
         return "x1g9anri" in classes
 
     @check_authorization
