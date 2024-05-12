@@ -177,15 +177,13 @@ class User(metaclass=Navigator):
         Raises:
             NotAuthenticated: Raises when the current account is not logged in.
         """
+        follow_btn = self._driver.find_element(
+            By.CSS_SELECTOR, "button._acan._acap._acat._aj1-._ap30"
+        )
 
-        self._driver.implicitly_wait(1)
+        state = follow_btn.find_element(By.XPATH, '//div[@dir="auto"]').text
 
-        if self._driver.find_elements(By.XPATH, '//div[text()="Follow"]'):
-            self._driver.implicitly_wait(10)
-            return False
-        elif self._driver.find_elements(By.XPATH, '//div[text()="Following"]'):
-            self._driver.implicitly_wait(10)
-            return True
+        return state == "Following"
 
     @check_authorization
     @check_private
@@ -220,7 +218,9 @@ class User(metaclass=Navigator):
             NotAuthenticated: Raises when the current account is not logged in.
             UserNotFollowed: Raises when the user is not followed.
         """
-        if not self.is_close_friend():
+        close_friend = self.is_close_friend()
+
+        if not close_friend:
             raise UserNotCloseFriend(self.name)
 
         close_friend_btn = self._driver.find_element(
@@ -245,12 +245,13 @@ class User(metaclass=Navigator):
             return False
 
         # Check if already close friend
-        element = self._driver.find_element(
+        close_friends_icon = self._driver.find_element(
             By.CSS_SELECTOR,
             'svg[aria-label="Close friend"]',
         )
 
-        classes = element.get_attribute("class").split(" ")
+        classes = close_friends_icon.get_attribute("class").split(" ")
+        print("Classes:", classes)
         return "x1g9anri" in classes
 
     @check_authorization
