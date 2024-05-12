@@ -320,8 +320,8 @@ class User(metaclass=Navigator):
         posts_str = posts_span.find_element(By.CSS_SELECTOR, "span").text
 
         # Remove the commas and convert to integer
-        followers = int(posts_str.replace(",", ""))
-        return followers
+        posts = int(posts_str.replace(",", ""))
+        return posts
 
     def get_followers(self) -> int:
         """
@@ -349,8 +349,8 @@ class User(metaclass=Navigator):
         following_str = following_span.find_element(By.CSS_SELECTOR, "span").text
 
         # Remove the commas and convert to integer
-        followers = int(following_str.replace(",", ""))
-        return followers
+        following = int(following_str.replace(",", ""))
+        return following
 
     @check_authorization
     @check_private
