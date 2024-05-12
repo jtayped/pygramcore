@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import ElementClickInterceptedException
 from urllib.parse import urlparse, urljoin
 import time
 
@@ -23,9 +24,11 @@ def user_dialog_action(func):
         if not user.is_following():
             raise UserNotFollowed(user.name)
 
-        # Open the dialog
-        dialog_btn = user._driver.find_element(By.XPATH, '//div[text()="Following"]')
-        dialog_btn.click()
+        # Raises a click interception error if the dialog was open already
+        try:
+            user.open_user_dialog()
+        except ElementClickInterceptedException:
+            pass
 
         # Perform function being decorated
         value = func(user, *args, **kwargs)
@@ -34,12 +37,7 @@ def user_dialog_action(func):
         # close the dialog automatically (e.g. unfollowing)
         try:
             user._driver.implicitly_wait(0)
-
-            close_btn = user._driver.find_element(
-                By.CSS_SELECTOR,
-                "body > div.x1n2onr6.xzkaem6 > div.x9f619.x1n2onr6.x1ja2u2z > div > div.x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj > div > div > div > div > div.x7r02ix.xf1ldfh.x131esax.xdajt7p.xxfnqb6.xb88tzc.xw2csxc.x1odjw0f.x5fp0pe > div > div > div > div.x78zum5.xds687c.x1iorvi4.x1sxyh0.xjkvuk6.xurb0ha.x10l6tqk.x1vjfegm > div > div > svg",
-            )
-            close_btn.click()
+            user.close_user_dialog()
         except:
             pass
         finally:
@@ -196,9 +194,10 @@ class User(metaclass=Navigator):
         """
         if self.is_close_friend():
             raise UserCloseFriend(self.name)
+        self.open_user_dialog()
 
         close_friend_btn = self._driver.find_element(
-            By.CSS_SELECTOR, "svg[aria-label='Close friend']"
+            By.CSS_SELECTOR, 'svg[aria-label="Close friend"]'
         )
         close_friend_btn.click()
 
@@ -214,10 +213,9 @@ class User(metaclass=Navigator):
             NotAuthenticated: Raises when the current account is not logged in.
             UserNotFollowed: Raises when the user is not followed.
         """
-        close_friend = self.is_close_friend()
-
-        if not close_friend:
+        if not self.is_close_friend():
             raise UserNotCloseFriend(self.name)
+        self.open_user_dialog()
 
         close_friend_btn = self._driver.find_element(
             By.CSS_SELECTOR, "svg[aria-label='Close friend']"
@@ -442,3 +440,14 @@ class User(metaclass=Navigator):
                 break
 
         return posts[:limit]
+
+    def open_user_dialog(self):
+        dialog_btn = self._driver.find_element(By.XPATH, '//div[text()="Following"]')
+        dialog_btn.click()
+
+    def close_user_dialog(self):
+        close_btn = self._driver.find_element(
+            By.CSS_SELECTOR,
+            'svg[aria-label="Close"]',
+        )
+        close_btn.click()
