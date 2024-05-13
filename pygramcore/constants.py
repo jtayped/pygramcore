@@ -12,3 +12,6 @@ IMPLICIT_WAIT = 10  # in sec.
 
 # URLs
 INSTAGRAM_URL = "https://www.instagram.com/"
+
+# Instagram values
+MAX_POST_COMMENTS = 195
