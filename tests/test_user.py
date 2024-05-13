@@ -5,17 +5,21 @@ import os
 
 import pytest
 
+COOKIES_PATH = "cookies.pkl"
+
 
 class TestUser:
     @classmethod
     def setup_class(self):
         load_dotenv()
 
-        self.email = os.getenv("EMAIL")
-        self.password = os.getenv("PASSWORD")
+        EMAIL = os.getenv("EMAIL")
+        PASSWORD = os.getenv("PASSWORD")
 
-    def test_login(self):
-        Account.login(self.email, self.password)
+        if os.path.exists(COOKIES_PATH):
+            Account.load_cookies("cookies.pkl")
+        else:
+            Account.login(EMAIL, PASSWORD)
 
     def test_follow(self, user: User):
         was_following = user.is_following()
