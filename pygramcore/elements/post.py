@@ -322,12 +322,13 @@ class Post(metaclass=Navigator):
                 By.XPATH, '//div[@class="x78zum5 xdt5ytf x1iyjqo2"]'
             )
             loaded_comments = comment_list.find_elements(By.XPATH, "./div")
-            self._driver.execute_script(
-                "arguments[0].scrollIntoView(true);", loaded_comments[-1]
-            )
 
             if len(loaded_comments) >= limit:
                 break
+
+            self._driver.execute_script(
+                "arguments[0].scrollIntoView(true);", loaded_comments[-1]
+            )
 
         comment_elements = loaded_comments[:limit]
 
