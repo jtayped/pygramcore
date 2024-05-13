@@ -308,3 +308,38 @@ class Post(metaclass=Navigator):
         publish_date = parse_instagram_date(time_str)
 
         return publish_date
+
+    def get_comments(self, limit=150) -> list:
+        if limit >= 195:
+            raise TooManyUsers
+
+        from .user import User
+        from .comment import Comment
+
+        comment_elements = []
+        while True:
+            comment_list = self._driver.find_element(
+                By.XPATH, '//div[@class="x78zum5 xdt5ytf x1iyjqo2"]'
+            )
+            loaded_comments = comment_list.find_elements(By.XPATH, "./div")
+            self._driver.execute_script(
+                "arguments[0].scrollIntoView(true);", loaded_comments[-1]
+            )
+
+            if len(loaded_comments) >= limit:
+                break
+
+        comment_elements = loaded_comments[:limit]
+
+        comments = []
+        for element in comment_elements:
+            author_name = element.find_element(
+                By.XPATH, '//span[@class="_ap3a _aaco _aacw _aacx _aad7 _aade"]'
+            ).text
+
+            user = User(author_name)
+
+            comment = Comment(user, self)
+            comments.append(comment)
+
+        return comments

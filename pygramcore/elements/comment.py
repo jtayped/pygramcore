@@ -18,7 +18,7 @@ class Comment:
     post: Post
     date: datetime
     text: str = None
-    likes: int = None
+    _likes: int = None
 
     @property
     def url(self):
@@ -27,6 +27,9 @@ class Comment:
     @property
     @check_authorization
     def likes(self):
+        if self._likes:
+            return self._likes
+
         comment_element = self.__find_comment()
         comment_functions_element = comment_element.find_element(
             By.XPATH,
@@ -38,8 +41,15 @@ class Comment:
         )
 
         # Convert the likes element to an integer (E.g. "11,560 likes" to 11560)
-        likes = int(likes_element.text.removesuffix(" likes").replace(",", ""))
-        return likes
+        self._likes = int(likes_element.text.removesuffix(" likes").replace(",", ""))
+        return self._likes
+
+    @likes.setter
+    def likes(self, new_likes):
+        if new_likes < 0:
+            return  # TODO: raise error
+
+        self._likes = new_likes
 
     @check_authorization
     def like(self):
