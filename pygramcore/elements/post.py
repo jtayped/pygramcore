@@ -309,7 +309,7 @@ class Post(metaclass=Navigator):
 
         return publish_date
 
-    def get_comments(self, limit=150) -> list:
+    def get_comments(self, limit=195) -> list:
         if limit >= 195:
             raise TooManyUsers
 
@@ -337,9 +337,13 @@ class Post(metaclass=Navigator):
                 By.XPATH, '//span[@class="_ap3a _aaco _aacw _aacx _aad7 _aade"]'
             ).text
 
-            user = User(author_name)
+            text = element.find_element(
+                By.XPATH,
+                '//div[@class="x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x1uhb9sk x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1cy8zhl x1oa3qoh x1nhvcw1"]//span[@dir="auto"]',
+            ).text
 
-            comment = Comment(user, self)
+            user = User(author_name)
+            comment = Comment(user, self, text)
             comments.append(comment)
 
         return comments
