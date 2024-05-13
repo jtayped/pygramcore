@@ -1,5 +1,7 @@
 from pygramcore.exceptions.user import *
 from pygramcore import User, Account
+from dotenv import load_dotenv
+import os
 
 import pytest
 
@@ -7,7 +9,13 @@ import pytest
 class TestUser:
     @classmethod
     def setup_class(self):
-        Account.load_cookies("cookies.pkl")
+        load_dotenv()
+
+        self.email = os.getenv("EMAIL")
+        self.password = os.getenv("PASSWORD")
+
+    def test_login(self):
+        Account.login(self.email, self.password)
 
     def test_follow(self, user: User):
         was_following = user.is_following()
@@ -40,7 +48,7 @@ class TestUser:
             user.follow()
 
         is_close_friend = user.is_close_friend()
-        
+
         # Toggle close friends
         if is_close_friend:
             user.remove_close_friend()
@@ -63,8 +71,8 @@ class TestUser:
             user.remove_close_friend()
 
     def test_private_accounts(self, user: User, private_user: User):
-        assert not user.is_private()        # expected: True
-        assert private_user.is_private()    # expected: False
+        assert not user.is_private()  # expected: True
+        assert private_user.is_private()  # expected: False
 
     def test_get_posts(self, user: User):
         # It should not be assumed that the user will not delete their posts.
