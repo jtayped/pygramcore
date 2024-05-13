@@ -10,15 +10,16 @@ from ..pygram import *
 
 
 @dataclass
-class Comment:
+class Comment(metaclass=Navigator):
     from .user import User
     from .post import Post
 
     author: User
     post: Post
-    date: datetime
-    text: str = None
+    text: str
+    date: datetime = None
     _likes: int = None
+    comment_element: WebElement = None
 
     @property
     def url(self):
@@ -105,6 +106,10 @@ class Comment:
         Returns:
             WebElement: The div associated to the comment.
         """
+        # Return the element if specified and in view
+        if self.comment_element and self.comment_element.is_displayed():
+            return self.comment_element
+
         # Navigate to the post that parents the comment
         navigate(self._driver, self.post.url)
 

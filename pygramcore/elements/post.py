@@ -343,7 +343,7 @@ class Post(metaclass=Navigator):
             ).text
 
             user = User(author_name)
-            comment = Comment(user, self, text)
+            comment = Comment(user, self, text, comment_element=element)
             comments.append(comment)
 
         return comments
