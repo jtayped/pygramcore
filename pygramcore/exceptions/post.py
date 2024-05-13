@@ -1,3 +1,5 @@
+from ..constants import MAX_POST_COMMENTS
+
 class PostLiked(Exception):
     def __init__(self):
         super().__init__("This post has already been liked.")
@@ -18,3 +20,8 @@ class TooManyUsers(Exception):
 
     def __init__(self):
         super().__init__("There aren't enough users in the list.")
+
+
+class TooManyComments(Exception):
+    def __init__(self):
+        super().__init__(f"There is a limit of {MAX_POST_COMMENTS} comments.")

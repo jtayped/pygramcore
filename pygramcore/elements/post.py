@@ -2,7 +2,10 @@ from dataclasses import dataclass
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import (
+    StaleElementReferenceException,
+    NoSuchElementException,
+)
 from datetime import datetime
 from urllib.parse import urljoin
 
@@ -309,9 +312,23 @@ class Post(metaclass=Navigator):
 
         return publish_date
 
-    def get_comments(self, limit=195) -> list:
-        if limit >= 195:
-            raise TooManyUsers
+    @check_authorization
+    def get_comments(self, limit=100) -> list:
+        """
+        Gets a list of comments from the post.
+
+        Args:
+            limit (int): Maximum number of comments
+
+        Returns:
+            list[Comment]: List of comment objects.
+
+        Raises:
+            TooManyComments: Raises when the limit is greater then the maximum number of comments on a post (195 comments).
+            NotAuthenticated: Raises when the current account is not logged in.
+        """
+        if limit > MAX_POST_COMMENTS:
+            raise TooManyComments
 
         from .user import User
         from .comment import Comment
@@ -334,17 +351,26 @@ class Post(metaclass=Navigator):
 
         comments = []
         for element in comment_elements:
+
             author_name = element.find_element(
-                By.XPATH, '//span[@class="_ap3a _aaco _aacw _aacx _aad7 _aade"]'
+                By.CSS_SELECTOR, "span._ap3a._aaco._aad7._aade"
             ).text
 
-            text = element.find_element(
-                By.XPATH,
-                '//div[@class="x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x1uhb9sk x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1cy8zhl x1oa3qoh x1nhvcw1"]//span[@dir="auto"]',
-            ).text
+            self._driver.implicitly_wait(0)
+            try:
+                content = element.find_element(
+                    By.XPATH,
+                    './/div[@class="x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x1uhb9sk x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1cy8zhl x1oa3qoh x1nhvcw1"]//span[@dir="auto"]',
+                ).text
+            except NoSuchElementException:
+                content = element.find_element(
+                    By.XPATH, './/img[@class="x107yiy2 xv8uw2v x1tfwpuw x2g32xy"]'
+                ).get_attribute("src")
+            finally:
+                self._driver.implicitly_wait(IMPLICIT_WAIT)
 
             user = User(author_name)
-            comment = Comment(user, self, text, comment_element=element)
+            comment = Comment(user, self, content, comment_element=element)
             comments.append(comment)
 
         return comments

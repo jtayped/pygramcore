@@ -118,3 +118,6 @@ class Comment(metaclass=Navigator):
 
         # If not found raise an error
         raise CannotFindComment
+
+    def __repr__(self) -> str:
+        return f"Comment(author={self.author.name}, post={self.post.id}, text='{self.text}')"
