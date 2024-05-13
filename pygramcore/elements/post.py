@@ -344,7 +344,7 @@ class Post(metaclass=Navigator):
             )
             loaded_comments = comment_list.find_elements(
                 By.XPATH,
-                './div[@class="x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x1uhb9sk x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh x1nhvcw1"]',
+                './div',
             )
             n_loaded_comments = len(loaded_comments)
             if n_loaded_comments >= limit:
@@ -357,10 +357,6 @@ class Post(metaclass=Navigator):
 
             # Check if the last element in the comments is not the loading wheel after scrolling
             # this indicates that the post has reached the maximum amount of comments.
-            self._driver.implicitly_wait(0)
-            loaded_comments = comment_list.find_elements(By.XPATH, "./div")
-            self._driver.implicitly_wait(IMPLICIT_WAIT)
-
             # The loading wheel will be the last div in loaded_comments and has no classes. So if
             # after scrolling we don't find a scroll wheel at the end, the loop must break.
             last_element = loaded_comments[-1]
