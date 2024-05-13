@@ -315,7 +315,7 @@ class Post(metaclass=Navigator):
     @check_authorization
     def get_comments(self, limit=100) -> list:
         """
-        Gets a list of comments from the post.
+        Gets a list of comments from the post. It is important to know that this function can return a number of comments lower than the "limit".
 
         Args:
             limit (int): Maximum number of comments
@@ -327,6 +327,8 @@ class Post(metaclass=Navigator):
             TooManyComments: Raises when the limit is greater then the maximum number of comments on a post (195 comments).
             NotAuthenticated: Raises when the current account is not logged in.
         """
+        # TODO: simplify this overly complex function
+
         if limit > MAX_POST_COMMENTS:
             raise TooManyComments
 
@@ -334,28 +336,52 @@ class Post(metaclass=Navigator):
         from .comment import Comment
 
         comment_elements = []
+        last_len = None
+        # Scroll the comments till the limit of comments is achieved
         while True:
             comment_list = self._driver.find_element(
                 By.XPATH, '//div[@class="x78zum5 xdt5ytf x1iyjqo2"]'
             )
-            loaded_comments = comment_list.find_elements(By.XPATH, "./div")
-
-            if len(loaded_comments) >= limit:
+            loaded_comments = comment_list.find_elements(
+                By.XPATH,
+                './div[@class="x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh x1uhb9sk x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh x1nhvcw1"]',
+            )
+            n_loaded_comments = len(loaded_comments)
+            if n_loaded_comments >= limit:
                 break
 
+            # Scroll to the last element
             self._driver.execute_script(
                 "arguments[0].scrollIntoView(true);", loaded_comments[-1]
             )
 
+            # Check if the last element in the comments is not the loading wheel after scrolling
+            # this indicates that the post has reached the maximum amount of comments.
+            self._driver.implicitly_wait(0)
+            loaded_comments = comment_list.find_elements(By.XPATH, "./div")
+            self._driver.implicitly_wait(IMPLICIT_WAIT)
+
+            # The loading wheel will be the last div in loaded_comments and has no classes. So if
+            # after scrolling we don't find a scroll wheel at the end, the loop must break.
+            last_element = loaded_comments[-1]
+            if last_element.get_attribute("class") != "":
+                break
+
+            if n_loaded_comments == last_len:
+                continue
+            last_len = n_loaded_comments
+
         comment_elements = loaded_comments[:limit]
-
-        comments = []
+        processed_comments = []
+        # Process all comment elements
         for element in comment_elements:
-
             author_name = element.find_element(
                 By.CSS_SELECTOR, "span._ap3a._aaco._aad7._aade"
             ).text
 
+            # Find the comment's content. Comments have two types: GIFs and text-based comments.
+            # They both have a different structures, so by attempting to find the text content
+            # and failing we can assume it is a GIF and find it's URL.
             self._driver.implicitly_wait(0)
             try:
                 content = element.find_element(
@@ -369,8 +395,10 @@ class Post(metaclass=Navigator):
             finally:
                 self._driver.implicitly_wait(IMPLICIT_WAIT)
 
+            # Creation of the Comment object
             user = User(author_name)
-            comment = Comment(user, self, content, comment_element=element)
-            comments.append(comment)
+            processed_comments.append(
+                Comment(user, self, content, comment_element=element)
+            )
 
-        return comments
+        return processed_comments
